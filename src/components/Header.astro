@@ -1,0 +1,131 @@
+---
+const links = [
+    { label: "Accueil", href: "/" },
+    { label: "À Propos", href: "/a-propos" },
+    { label: "Programmation", href: "/programmation" },
+    { label: "Artistes", href: "/artistes" },
+    { label: "Scène", href: "/scene" },
+    { label: "Infos pratiques", href: "/infos-pratiques" },
+    { label: "Contact", href: "/contact" },
+];
+---
+
+<header class="relative bg-amber-300 px-4 py-5 md:px-8">
+    <div class="mx-auto flex max-w-7xl items-center justify-between">
+        <a
+            href="/"
+            aria-label="Accueil"
+            class="text-4xl font-black uppercase tracking-tight text-black [font-family:var(--title)] md:text-7xl"
+        >
+            Jumelages
+        </a>
+
+        <button
+            id="menu-btn"
+            type="button"
+            aria-label="Ouvrir le menu"
+            aria-expanded="false"
+            aria-controls="mobile-menu"
+            class="relative z-30 flex h-10 w-10 flex-col items-center justify-center gap-1.5"
+        >
+            <span class="block h-1 w-9 bg-black transition-all duration-300"
+            ></span>
+            <span class="block h-1 w-9 bg-black transition-all duration-300"
+            ></span>
+            <span class="block h-1 w-9 bg-black transition-all duration-300"
+            ></span>
+        </button>
+    </div>
+
+    <div
+        id="mobile-overlay"
+        class="invisible fixed inset-0 z-20 bg-black/20 opacity-0 transition-all duration-300"
+    >
+    </div>
+
+    <nav
+        id="mobile-menu"
+        aria-hidden="true"
+        class="invisible fixed left-0 top-0 z-30 h-screen w-[85vw] max-w-100 -translate-x-full bg-amber-300 px-6 py-8 opacity-0 transition-all duration-300"
+    >
+        <div class="mb-10 flex items-center justify-between">
+            <a
+                href="/"
+                aria-label="Accueil"
+                class="text-3xl font-black uppercase tracking-tight text-black [font-family:var(--title)]"
+                >Jumelages</a
+            >
+            <button
+                id="menu-close"
+                type="button"
+                aria-label="Fermer le menu"
+                class="text-5xl leading-none text-black">×</button
+            >
+        </div>
+
+        <ul class="space-y-6">
+            {
+                links.map((link) => (
+                    <li>
+                        <a
+                            href={link.href}
+                            class="block bg-gray-200 px-4 py-4 text-center text-5xl font-medium text-black md:text-4xl"
+                        >
+                            {link.label}
+                        </a>
+                    </li>
+                ))
+            }
+        </ul>
+    </nav>
+</header>
+
+<script>
+    const menuBtn = document.querySelector("#menu-btn");
+    const menuClose = document.querySelector("#menu-close");
+    const menu = document.querySelector("#mobile-menu");
+    const overlay = document.querySelector("#mobile-overlay");
+
+    function openMenu() {
+        if (!menuBtn || !menu || !overlay) return;
+
+        menuBtn.setAttribute("aria-expanded", "true");
+        menu.setAttribute("aria-hidden", "false");
+
+        menu.classList.remove("invisible", "opacity-0", "-translate-x-full");
+        overlay.classList.remove("invisible", "opacity-0");
+
+        document.body.classList.add("overflow-hidden");
+    }
+
+    function closeMenu() {
+        if (!menuBtn || !menu || !overlay) return;
+
+        menuBtn.setAttribute("aria-expanded", "false");
+        menu.setAttribute("aria-hidden", "true");
+
+        menu.classList.add("invisible", "opacity-0", "-translate-x-full");
+        overlay.classList.add("invisible", "opacity-0");
+
+        document.body.classList.remove("overflow-hidden");
+    }
+
+    if (menuBtn && menu && overlay) {
+        menuBtn.addEventListener("click", () => {
+            const isOpen = menuBtn.getAttribute("aria-expanded") === "true";
+            if (isOpen) {
+                closeMenu();
+            } else {
+                openMenu();
+            }
+        });
+    }
+
+    if (menuClose) {
+        menuClose.addEventListener("click", closeMenu);
+    }
+
+    if (overlay) {
+        overlay.addEventListener("click", closeMenu);
+    }
+</script>

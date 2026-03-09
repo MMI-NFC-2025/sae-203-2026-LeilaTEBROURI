@@ -1,1 +1,19 @@
+@import url("https://fonts.googleapis.com/css2?family=Barrio&display=swap");
 @import "tailwindcss";
+
+
+@theme {
+    --body-text: "Anonymous Pro", monospace;
+    --contact-text: "Anonymous Pro", monospace;
+    --text-card: var(--body-text);
+
+    --background-texte: #446b8d;
+    --background: #6189ad;
+    --main-red: #fb6e6e;
+    --main-yellow: #fdce53;
+
+    --title: "Barrio", cursive;
+    --texte: "Roboto", sans-serif;
+
+    --my-grid: repeat(12, minmax(0, 88px));
+}
