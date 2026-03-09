@@ -6,6 +6,7 @@ const pb = new PocketBase(POCKETBASE_URL);
 const COLLECTIONS = {
     artiste: "artiste",
     scene: "scene",
+    partenaire: "partenaire",
     users: "users"
 };
 
@@ -43,6 +44,45 @@ export async function allScenesByName() {
     return pb.collection(COLLECTIONS.scene).getFullList({
         sort: "nom"
     });
+}
+
+
+
+// Liste des partenaires
+export async function allPartenairesByCreated() {
+    return pb.collection(COLLECTIONS.partenaire).getFullList({
+        sort: "created",
+        fields: "id,nom,lien,logo"
+    });
+}
+
+
+
+// Liste partenaires prête pour le front
+export async function homepagePartenaires() {
+    try {
+        const records = await allPartenairesByCreated();
+
+        return records.map((partenaire) => ({
+            id: partenaire.id,
+            nom: String(partenaire.nom ?? ""),
+            lien: partenaire.lien ? String(partenaire.lien) : undefined,
+            logo: partenaire.logo ? String(partenaire.logo) : undefined
+        }));
+    } catch {
+        return [];
+    }
+}
+
+
+
+// URL logo partenaire
+export function partenaireLogoUrl(partenaire) {
+    if (!partenaire?.logo || !partenaire?.id) {
+        return "";
+    }
+
+    return `${POCKETBASE_URL}/api/files/${COLLECTIONS.partenaire}/${partenaire.id}/${partenaire.logo}`;
 }
 
 

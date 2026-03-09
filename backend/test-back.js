@@ -1,11 +1,14 @@
 import {
     allArtistesByDate,
     allScenesByName,
+    allPartenairesByCreated,
+    homepagePartenaires,
     allArtistesAlphabet,
     artisteById,
     sceneById,
     artistesBySceneId,
     artistesBySceneName,
+    partenaireLogoUrl,
     saveEntity,
     loginUser,
     logoutUser
@@ -14,6 +17,7 @@ import {
 
 let artistesByDate = [];
 let scenesByName = [];
+let partenairesByCreated = [];
 
 // Test artistes triés par date
 try {
@@ -39,6 +43,40 @@ try {
 try {
     console.log("=== Artistes alphabet ===");
     console.log(await allArtistesAlphabet());
+} catch (e) {
+    console.error(e);
+}
+
+
+// Test partenaires triés par date de création
+try {
+    console.log("=== Partenaires par date de création ===");
+    partenairesByCreated = await allPartenairesByCreated();
+    console.log(partenairesByCreated);
+} catch (e) {
+    console.error(e);
+}
+
+
+// Test URL logo partenaire
+try {
+    console.log("=== URL logo partenaire ===");
+    const partenaire = partenairesByCreated[0];
+
+    if (!partenaire) {
+        throw new Error("Aucun partenaire disponible.");
+    }
+
+    console.log(partenaireLogoUrl(partenaire));
+} catch (e) {
+    console.error(e);
+}
+
+
+// Test partenaires format front
+try {
+    console.log("=== Partenaires format front ===");
+    console.log(await homepagePartenaires());
 } catch (e) {
     console.error(e);
 }

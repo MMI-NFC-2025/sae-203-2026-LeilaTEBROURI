@@ -10,6 +10,21 @@ import imageVinyl from "../assets/imagevinyl.avif";
 import imgProgramme from "../assets/img_programme.jpg";
 import imgArtiste from "../assets/img_artiste.jpg";
 import imgInfosPratiques from "../assets/infos_pratiques .jpg";
+import {
+	homepagePartenaires,
+	partenaireLogoUrl,
+} from "../../backend/backend.mjs";
+
+type PartenaireRecord = {
+	id: string;
+	nom: string;
+	lien?: string;
+	logo?: string;
+};
+
+const partenaires = (await homepagePartenaires()) as PartenaireRecord[];
+
+const getPartenaireLogoUrl = partenaireLogoUrl;
 ---
 
 <Layout>
@@ -81,34 +96,74 @@ import imgInfosPratiques from "../assets/infos_pratiques .jpg";
 					class="block h-80 w-full object-cover"
 					loading="lazy"
 				/>
-				<div class="bg-(--yellow) py-6 text-center text-black">
-					<h3 class="text-6xl leading-none">Programme</h3>
+				<div
+					class="bg-(--yellow) py-6 text-center text-black rounded-4xl ml-20 mr-20 mt-10"
+				>
+					<h3 class="leading-none">Programme</h3>
 				</div>
 			</a>
 
-			<a href="/artistes" class="block mt-40">
+			<a href="/artistes" class="block mt-30">
 				<img
 					src={imgArtiste.src}
 					alt="Invités"
 					class="block h-80 w-full object-cover"
 					loading="lazy"
 				/>
-				<div class="bg-(--yellow) py-6 text-center text-black">
-					<h3 class="text-6xl leading-none">Invités</h3>
+				<div
+					class="bg-(--yellow) py-6 text-center text-black rounded-4xl ml-20 mr-20 mt-10"
+				>
+					<h3 class="leading-none">Invités</h3>
 				</div>
 			</a>
 
-			<a href="/infos-pratiques" class="block mt-40">
+			<a href="/infos-pratiques" class="block mt-30">
 				<img
 					src={imgInfosPratiques.src}
 					alt="Infos pratiques"
 					class="block h-80 w-full object-cover"
 					loading="lazy"
 				/>
-				<div class="bg-(--yellow) py-6 text-center text-black">
-					<h3 class="text-6xl leading-none">Infos pratiques</h3>
+				<div
+					class="bg-(--yellow) py-6 text-center text-black rounded-4xl ml-20 mr-20 mt-10"
+				>
+					<h3 class="leading-none">Infos pratiques</h3>
 				</div>
 			</a>
+		</section>
+
+		<section class="mt-20 bg-(--red)">
+			<div class="py-8 text-center">
+				<h2 class="text-4xl leading-none">Partenaires</h2>
+			</div>
+
+			<div class="grid grid-cols-2 items-center gap-8 px-6 py-16">
+				{
+					partenaires.length > 0 ? (
+						partenaires.map((partenaire) => (
+							<a
+								href={partenaire.lien || "#"}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="flex items-center justify-center"
+							>
+								{getPartenaireLogoUrl(partenaire) && (
+									<img
+										src={getPartenaireLogoUrl(partenaire)}
+										alt={partenaire.nom}
+										class="block w-full max-w-xs object-contain"
+										loading="lazy"
+									/>
+								)}
+							</a>
+						))
+					) : (
+						<p class="text-center text-2xl text-gray-100">
+							Aucun partenaire disponible pour le moment.
+						</p>
+					)
+				}
+			</div>
 		</section>
 	</main>
 	<Footer />
