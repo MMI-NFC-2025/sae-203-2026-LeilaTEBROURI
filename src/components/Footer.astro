@@ -2,13 +2,15 @@
 import mmiLogo from "../assets/logo_mmi.webp";
 ---
 
-<footer class="bg-amber-300 px-4 py-8 text-black md:px-8 md:py-10">
-    <div class="mx-auto grid max-w-7xl grid-cols-[1fr_auto] gap-8 md:gap-12">
+<footer class="bg-amber-300 px-4 py-8 text-black">
+    <div class="mx-auto grid max-w-7xl grid-cols-[1fr_auto] gap-8">
         <div class="space-y-10">
-            <h2 class="text-4xl uppercase">
-                Jumelages<br />
-                Festival
-            </h2>
+            <div class="space-y-1">
+                <h2 class="text-5xl uppercase">
+                    Jumelages<br />
+                </h2>
+                <h3 class="m-0 uppercase">Festival</h3>
+            </div>
 
             <section class="space-y-3 text-base">
                 <h3 class="font-bold uppercase">Contact</h3>
@@ -28,9 +30,9 @@ import mmiLogo from "../assets/logo_mmi.webp";
             </section>
         </div>
 
-        <div class="flex flex-col items-start gap-6 md:items-end">
+        <div class="mt-33 flex flex-col items-start gap-6">
             <nav aria-label="Navigation footer">
-                <ul class="space-y-2 text-base leading-snug md:text-right">
+                <ul class="space-y-2 text-base leading-snug">
                     <li><a href="/festival">Festival</a></li>
                     <li><a href="/contact">Contactez-nous</a></li>
                     <li><a href="/a-propos">À propos</a></li>
@@ -38,9 +40,9 @@ import mmiLogo from "../assets/logo_mmi.webp";
                 </ul>
             </nav>
 
-            <div class="h-1 w-full bg-black md:w-72"></div>
+            <div class="h-1 w-full bg-black rounded-4xl"></div>
 
-            <div class="w-full max-w-xs rounded-4xl p-5 md:w-72">
+            <div class="w-full max-w-xs rounded-4xl p-5">
                 <img
                     src={mmiLogo.src}
                     alt="Logo MMI"

@@ -2,10 +2,114 @@
 import Layout from "../layouts/Layout.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import Hero from "../components/hero.astro";
+import iconCalendar from "../assets/Icone_calendrier.svg";
+import iconLocation from "../assets/Icone_position.svg";
+import iconTicket from "../assets/Icone_billeterie.svg";
+import imageVinyl from "../assets/imagevinyl.avif";
+import imgProgramme from "../assets/img_programme.jpg";
+import imgArtiste from "../assets/img_artiste.jpg";
+import imgInfosPratiques from "../assets/infos_pratiques .jpg";
 ---
 
 <Layout>
 	<Header />
-	<main class="min-h-[40vh] bg-(--blue)"></main>
+	<main class="min-h-[40vh] bg-(--blue) pb-8">
+		<Hero />
+		<section class="space-y-6 px-2 py-6 mt-20">
+			<div
+				class="flex items-center gap-5 rounded-4xl bg-gray-100 px-6 py-7 shadow-md"
+			>
+				<img
+					src={iconCalendar.src}
+					alt="Calendrier"
+					class="h-10 w-10"
+					loading="lazy"
+				/>
+				<p class="pl-5 text-2xl leading-none">Du 28 au 30 Août 2026</p>
+			</div>
+
+			<div
+				class="flex items-center gap-5 rounded-4xl bg-gray-100 px-6 py-7 shadow-md"
+			>
+				<img
+					src={iconLocation.src}
+					alt="Localisation"
+					class="h-10 w-10"
+					loading="lazy"
+				/>
+				<p class="pl-5 text-2xl leading-tight">
+					Parc du Près-la-Rose, Montbéliard
+				</p>
+			</div>
+
+			<a
+				href="/billetterie"
+				class="flex items-center gap-5 rounded-4xl bg-(--yellow) px-6 py-7 shadow-md"
+			>
+				<img
+					src={iconTicket.src}
+					alt="Billetterie"
+					class="h-10 w-10"
+					loading="lazy"
+				/>
+				<p class="pl-5 text-2xl leading-none">Billetterie</p>
+			</a>
+		</section>
+
+		<section class="mt-6 bg-(--red) px-6 py-8">
+			<h2 class="text-6xl uppercase leading-none">
+				Musique<br />
+				Régionale
+			</h2>
+			<div class="mt-8 h-2 w-40 bg-black rounded-4xl"></div>
+			<h3 class="mt-12 text-6xl uppercase leading-none">Folk</h3>
+		</section>
+
+		<img
+			src={imageVinyl.src}
+			alt="Image vinyle"
+			class="mt-20 block h-auto w-30"
+			loading="lazy"
+		/>
+
+		<section class="mt-40">
+			<a href="/programmation" class="block">
+				<img
+					src={imgProgramme.src}
+					alt="Programme"
+					class="block h-80 w-full object-cover"
+					loading="lazy"
+				/>
+				<div class="bg-(--yellow) py-6 text-center text-black">
+					<h3 class="text-6xl leading-none">Programme</h3>
+				</div>
+			</a>
+
+			<a href="/artistes" class="block mt-40">
+				<img
+					src={imgArtiste.src}
+					alt="Invités"
+					class="block h-80 w-full object-cover"
+					loading="lazy"
+				/>
+				<div class="bg-(--yellow) py-6 text-center text-black">
+					<h3 class="text-6xl leading-none">Invités</h3>
+				</div>
+			</a>
+
+			<a href="/infos-pratiques" class="block mt-40">
+				<img
+					src={imgInfosPratiques.src}
+					alt="Infos pratiques"
+					class="block h-80 w-full object-cover"
+					loading="lazy"
+				/>
+				<div class="bg-(--yellow) py-6 text-center text-black">
+					<h3 class="text-6xl leading-none">Infos pratiques</h3>
+				</div>
+			</a>
+		</section>
+	</main>
 	<Footer />
 </Layout>
