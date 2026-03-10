@@ -1,0 +1,36 @@
+---
+import { getPocketBaseClient } from "../../backend/backend.mjs";
+
+interface Props {
+    record?: Record<string, unknown> | null;
+    field?: string;
+    alt?: string;
+    classImg?: string;
+    size?: string;
+}
+
+const {
+    record = null,
+    field = "photo",
+    alt = "Image",
+    classImg = "",
+    size = "1600x400",
+} = Astro.props as Props;
+
+const pb = getPocketBaseClient();
+const imageFieldValue = record?.[field];
+const imageUrl = imageFieldValue
+    ? pb.files.getURL(record, String(imageFieldValue), { thumb: size })
+    : null;
+---
+
+{
+    imageUrl && (
+        <img
+            class={classImg}
+            src={imageUrl}
+            alt={alt || "Image"}
+            loading="lazy"
+        />
+    )
+}

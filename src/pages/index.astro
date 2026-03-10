@@ -7,6 +7,7 @@ import iconCalendar from "../assets/Icone_calendrier.svg";
 import iconLocation from "../assets/Icone_position.svg";
 import iconTicket from "../assets/Icone_billeterie.svg";
 import imageVinyl from "../assets/imagevinyl.avif";
+import imageIllustrationGraphique from "../assets/imageillustrationgraphique.avif";
 import imgProgramme from "../assets/img_programme.jpg";
 import imgArtiste from "../assets/img_artiste.jpg";
 import imgInfosPratiques from "../assets/infos_pratiques .jpg";
@@ -29,28 +30,28 @@ const getPartenaireLogoUrl = partenaireLogoUrl;
 
 <Layout>
 	<Header />
-	<main class="min-h-[40vh] bg-(--blue) pb-8">
+	<main class="min-h-screen bg-(--blue)">
 		<Hero />
 		<section class="space-y-6 px-2 py-6 mt-20">
 			<div
-				class="flex items-center gap-5 rounded-4xl bg-gray-100 px-6 py-7 shadow-md"
+				class="flex items-center gap-5 bg-gray-100 px-6 py-7 shadow-md"
 			>
 				<img
 					src={iconCalendar.src}
 					alt="Calendrier"
-					class="h-10 w-10"
+					class="h-7 w-7"
 					loading="lazy"
 				/>
 				<p class="pl-5 text-2xl leading-none">Du 28 au 30 Août 2026</p>
 			</div>
 
 			<div
-				class="flex items-center gap-5 rounded-4xl bg-gray-100 px-6 py-7 shadow-md"
+				class="flex items-center gap-5 bg-gray-100 px-6 py-7 shadow-md"
 			>
 				<img
 					src={iconLocation.src}
 					alt="Localisation"
-					class="h-10 w-10"
+					class="h-7 w-7"
 					loading="lazy"
 				/>
 				<p class="pl-5 text-2xl leading-tight">
@@ -60,12 +61,12 @@ const getPartenaireLogoUrl = partenaireLogoUrl;
 
 			<a
 				href="/billetterie"
-				class="flex items-center gap-5 rounded-4xl bg-(--yellow) px-6 py-7 shadow-md"
+				class="flex items-center gap-5 bg-(--yellow) px-6 py-7 shadow-md"
 			>
 				<img
 					src={iconTicket.src}
 					alt="Billetterie"
-					class="h-10 w-10"
+					class="h-7 w-7"
 					loading="lazy"
 				/>
 				<p class="pl-5 text-2xl leading-none">Billetterie</p>
@@ -81,14 +82,29 @@ const getPartenaireLogoUrl = partenaireLogoUrl;
 			<h3 class="mt-12 text-6xl uppercase leading-none">Folk</h3>
 		</section>
 
-		<img
-			src={imageVinyl.src}
-			alt="Image vinyle"
-			class="mt-20 block h-auto w-30"
-			loading="lazy"
-		/>
+		<div class="relative mt-30">
+			<img
+				src={imageIllustrationGraphique.src}
+				alt="Illustration graphique"
+				class="block h-auto w-full"
+				loading="lazy"
+			/>
 
-		<section class="mt-40">
+			<img
+				src={imageVinyl.src}
+				alt="Image vinyle"
+				class="absolute -top-16 left-0 z-10 block h-auto w-30"
+				loading="lazy"
+			/>
+		</div>
+
+		<section class="mt-20">
+			<a
+				href="/programmation"
+				class="block bg-(--yellow) py-6 text-center text-black mx-10 ml-10 mr-10 mb-2"
+			>
+				<h3 class="leading-none">Programme</h3>
+			</a>
 			<a href="/programmation" class="block">
 				<img
 					src={imgProgramme.src}
@@ -96,44 +112,41 @@ const getPartenaireLogoUrl = partenaireLogoUrl;
 					class="block h-80 w-full object-cover"
 					loading="lazy"
 				/>
-				<div
-					class="bg-(--yellow) py-6 text-center text-black rounded-4xl ml-20 mr-20 mt-10"
-				>
-					<h3 class="leading-none">Programme</h3>
-				</div>
 			</a>
 
-			<a href="/artistes" class="block mt-30">
+			<a
+				href="/artistes"
+				class="block bg-(--yellow) py-6 text-center text-black mx-10 ml-10 mr-10 mb-2 mt-10"
+			>
+				<h3 class="leading-none">Invités</h3>
+			</a>
+			<a href="/artistes" class="block">
 				<img
 					src={imgArtiste.src}
 					alt="Invités"
 					class="block h-80 w-full object-cover"
 					loading="lazy"
 				/>
-				<div
-					class="bg-(--yellow) py-6 text-center text-black rounded-4xl ml-20 mr-20 mt-10"
-				>
-					<h3 class="leading-none">Invités</h3>
-				</div>
 			</a>
 
-			<a href="/infos-pratiques" class="block mt-30">
+			<a
+				href="/infos-pratiques"
+				class="block bg-(--yellow) py-6 text-center text-black mx-10 ml-10 mr-10 mt-10 mb-2"
+			>
+				<h3 class="leading-none">Infos pratiques</h3>
+			</a>
+			<a href="/infos-pratiques" class="block">
 				<img
 					src={imgInfosPratiques.src}
 					alt="Infos pratiques"
 					class="block h-80 w-full object-cover"
 					loading="lazy"
 				/>
-				<div
-					class="bg-(--yellow) py-6 text-center text-black rounded-4xl ml-20 mr-20 mt-10"
-				>
-					<h3 class="leading-none">Infos pratiques</h3>
-				</div>
 			</a>
 		</section>
 
-		<section class="mt-20 bg-(--red)">
-			<div class="py-8 text-center">
+		<section class="mt-20">
+			<div class="py-8 text-center bg-(--red) mx-10 mb-10">
 				<h2 class="text-4xl leading-none">Partenaires</h2>
 			</div>
 

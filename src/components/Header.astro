@@ -46,30 +46,30 @@ const links = [
     <nav
         id="mobile-menu"
         aria-hidden="true"
-        class="invisible fixed left-0 top-0 z-30 h-screen w-[85vw] max-w-100 -translate-x-full overflow-y-auto overscroll-contain bg-amber-300 px-6 py-8 opacity-0 transition-all duration-300"
+        class="invisible fixed left-0 top-0 z-30 h-screen w-3/4 max-w-80 -translate-x-full overflow-y-auto overscroll-contain bg-amber-300 px-5 py-6 opacity-0 transition-all duration-300"
     >
         <div class="mb-10 flex items-center justify-between">
             <a
                 href="/"
                 aria-label="Accueil"
-                class="text-3xl font-black uppercase tracking-tight text-black font-important"
+                class="text-2xl font-black uppercase tracking-tight text-black font-important"
                 >Jumelages</a
             >
             <button
                 id="menu-close"
                 type="button"
                 aria-label="Fermer le menu"
-                class="text-5xl leading-none text-black">×</button
+                class="text-4xl leading-none text-black">×</button
             >
         </div>
 
-        <ul class="space-y-6">
+        <ul class="space-y-4">
             {
                 links.map((link) => (
                     <li>
                         <a
                             href={link.href}
-                            class="block bg-gray-100 px-4 py-4 text-center text-4xl font-medium text-black"
+                            class="block bg-gray-100 px-3 py-3 text-center text-2xl font-medium text-black"
                         >
                             {link.label}
                         </a>

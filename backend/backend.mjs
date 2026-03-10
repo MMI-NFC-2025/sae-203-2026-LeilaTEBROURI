@@ -6,9 +6,13 @@ const pb = new PocketBase(POCKETBASE_URL);
 const COLLECTIONS = {
     artiste: "artiste",
     scene: "scene",
+    equipe: "equipe",
     partenaire: "partenaire",
     users: "users"
 };
+
+const SCENE_PRINCIPALE_NAME = "La Scène Principale";
+const EQUIPE_FIRST_MEMBER_NAME = "Sophie Marchand";
 
 function escapeFilterValue(value) {
     return String(value).replace(/\\/g, "\\\\").replace(/\"/g, '\\\"');
@@ -83,6 +87,80 @@ export function partenaireLogoUrl(partenaire) {
     }
 
     return `${POCKETBASE_URL}/api/files/${COLLECTIONS.partenaire}/${partenaire.id}/${partenaire.logo}`;
+}
+
+
+
+// Infos scène principale prêtes pour le front
+export async function homepageScenePrincipale() {
+    try {
+        const safeSceneName = escapeFilterValue(SCENE_PRINCIPALE_NAME);
+        const scene = await pb.collection(COLLECTIONS.scene).getFirstListItem(
+            `nom = "${safeSceneName}"`,
+            {
+                fields: "id,nom,img,description,localisation,capacite"
+            }
+        );
+
+        return {
+            id: scene.id,
+            collectionName: COLLECTIONS.scene,
+            nom: String(scene.nom ?? ""),
+            img: scene.img ? String(scene.img) : "",
+            description: scene.description ? String(scene.description) : "",
+            localisation: scene.localisation ? String(scene.localisation) : "",
+            capacite: scene.capacite ?? null
+        };
+    } catch {
+        return null;
+    }
+}
+
+
+
+// URL image scène
+export function sceneImgUrl(scene) {
+    if (!scene?.img || !scene?.id) {
+        return "";
+    }
+
+    return `${POCKETBASE_URL}/api/files/${COLLECTIONS.scene}/${scene.id}/${scene.img}`;
+}
+
+
+
+// Liste équipe prête pour le front
+export async function homepageEquipe() {
+    try {
+        const records = await pb.collection(COLLECTIONS.equipe).getFullList({
+            sort: "nom",
+            fields: "id,nom,role,img"
+        });
+
+        const membres = records.map((membre) => ({
+            id: membre.id,
+            collectionName: COLLECTIONS.equipe,
+            nom: String(membre.nom ?? ""),
+            role: String(membre.role ?? ""),
+            img: membre.img ? String(membre.img) : ""
+        }));
+
+        membres.sort((firstMember, secondMember) => {
+            if (firstMember.nom === EQUIPE_FIRST_MEMBER_NAME) {
+                return -1;
+            }
+
+            if (secondMember.nom === EQUIPE_FIRST_MEMBER_NAME) {
+                return 1;
+            }
+
+            return firstMember.nom.localeCompare(secondMember.nom, "fr");
+        });
+
+        return membres;
+    } catch {
+        return [];
+    }
 }
 
 

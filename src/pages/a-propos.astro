@@ -1,0 +1,112 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import PbImage from "../components/PbImage.astro";
+import image3 from "../assets/image3.avif";
+import {
+    homepageEquipe,
+    homepageScenePrincipale,
+} from "../../backend/backend.mjs";
+
+const scenePrincipale = await homepageScenePrincipale();
+const equipe = await homepageEquipe();
+---
+
+<Layout>
+    <Header />
+    <main class="min-h-screen bg-(--blue) pt-10 pb-10">
+        <div
+            class="mx-auto w-fit bg-(--red) px-8 py-5 text-center text-black mb-10"
+        >
+            <h2 class="leading-none">À Propos</h2>
+        </div>
+        <section class="h-100 w-full overflow-hidden">
+            <PbImage
+                record={scenePrincipale}
+                field="img"
+                alt={scenePrincipale?.nom || "Scène principale"}
+                classImg="block h-11/12 w-full object-cover"
+                size="1600x0"
+            />
+        </section>
+
+        <section class="">
+            <div class="bg-(--yellow) p-7 text-(--dark) ml-3 mr-3">
+                <p class="leading-tight">
+                    Né de la volonté de valoriser les jumelages européens de
+                    Montbéliard, Jumelages Festival réunit chaque été des
+                    groupes folk et des ensembles traditionnels venus des villes
+                    partenaires. L’édition 2026 met à l’honneur les musiques et
+                    danses régionales dans un esprit de partage et de fête.
+                </p>
+            </div>
+        </section>
+
+        <section>
+            <div
+                class="mx-auto w-fit bg-(--red) px-8 py-5 text-center text-black mb-10 mt-15"
+            >
+                <h2 class="leading-none">Equipe</h2>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6 px-4">
+                {
+                    equipe.length > 0 ? (
+                        equipe.map((membre) => (
+                            <article class="text-center text-(--light)">
+                                <PbImage
+                                    record={membre}
+                                    field="img"
+                                    alt={membre.nom || "Membre équipe"}
+                                    classImg="h-40 w-full object-cover"
+                                    size="400x400"
+                                />
+                                <h3 class="mt-3 text-2xl leading-tight">
+                                    {membre.nom}
+                                </h3>
+                                <p class="mt-1 text-base leading-tight">
+                                    {membre.role}
+                                </p>
+                            </article>
+                        ))
+                    ) : (
+                        <p class="col-span-2 text-center text-(--light)">
+                            Aucun membre de l'équipe pour le moment.
+                        </p>
+                    )
+                }
+            </div>
+        </section>
+        <section class="">
+            <div class="bg-(--yellow) p-7 text-(--dark) ml-3 mr-3 mt-10">
+                <p class="leading-tight">
+                    Le festival est coordonné par une équipe mixte de
+                    professionnels de l’événementiel et de bénévoles issus des
+                    comités de jumelage, accompagnés par des associations
+                    locales de musique et de danse.
+                </p>
+            </div>
+        </section>
+
+        <img
+            src={image3.src}
+            alt="Image illustration"
+            class="mt-20 block h-auto w-full"
+            loading="lazy"
+        />
+
+        <section class="">
+            <div class="bg-(--yellow) p-7 text-(--dark) ml-3 mr-3 mt-10">
+                <p class="leading-tight">
+                    Jumelages Festival défend la découverte des cultures
+                    régionales, l’ouverture européenne, la convivialité et
+                    l’accessibilité au plus grand nombre. Le festival privilégie
+                    les circuits courts, une restauration locale et des actions
+                    écoresponsables sur le site.
+                </p>
+            </div>
+        </section>
+    </main>
+    <Footer />
+</Layout>
