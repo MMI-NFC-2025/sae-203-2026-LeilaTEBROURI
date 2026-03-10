@@ -30,11 +30,11 @@ const getPartenaireLogoUrl = partenaireLogoUrl;
 
 <Layout>
 	<Header />
-	<main class="min-h-screen bg-(--blue)">
+	<main class="min-h-screen bg-(--blue) lg:pb-16 lg:space-y-4">
 		<Hero />
-		<section class="space-y-6 px-2 py-6 mt-20">
+		<section class="grille mt-20 px-2 py-6 max-lg:space-y-6 lg:mt-12">
 			<div
-				class="flex items-center gap-5 bg-gray-100 px-6 py-7 shadow-md"
+				class="flex items-center gap-5 bg-gray-100 px-6 py-7 shadow-md lg:col-span-4 lg:px-8"
 			>
 				<img
 					src={iconCalendar.src}
@@ -46,7 +46,7 @@ const getPartenaireLogoUrl = partenaireLogoUrl;
 			</div>
 
 			<div
-				class="flex items-center gap-5 bg-gray-100 px-6 py-7 shadow-md"
+				class="flex items-center gap-5 bg-gray-100 px-6 py-7 shadow-md lg:col-span-4 lg:px-8"
 			>
 				<img
 					src={iconLocation.src}
@@ -61,7 +61,7 @@ const getPartenaireLogoUrl = partenaireLogoUrl;
 
 			<a
 				href="/billetterie"
-				class="flex items-center gap-5 bg-(--yellow) px-6 py-7 shadow-md"
+				class="flex items-center gap-5 bg-(--yellow) px-6 py-7 shadow-md lg:col-span-4 lg:px-8"
 			>
 				<img
 					src={iconTicket.src}
@@ -73,32 +73,38 @@ const getPartenaireLogoUrl = partenaireLogoUrl;
 			</a>
 		</section>
 
-		<section class="mt-6 bg-(--red) px-6 py-8">
-			<h2 class="text-6xl uppercase leading-none">
-				Musique<br />
-				Régionale
-			</h2>
-			<div class="mt-8 h-2 w-40 bg-black rounded-4xl"></div>
-			<h3 class="mt-12 text-6xl uppercase leading-none">Folk</h3>
-		</section>
+		<div class="grille lg:items-center">
+			<section
+				class="mt-6 bg-(--red) px-6 py-8 lg:mt-10 lg:px-10 lg:py-12 lg:col-span-5"
+			>
+				<h2 class="text-6xl uppercase leading-none">
+					Musique<br />
+					Régionale
+				</h2>
+				<div class="mt-8 h-2 w-40 bg-black rounded-4xl"></div>
+				<h3 class="mt-12 text-6xl uppercase leading-none">Folk</h3>
+			</section>
 
-		<div class="relative mt-30">
-			<img
-				src={imageIllustrationGraphique.src}
-				alt="Illustration graphique"
-				class="block h-auto w-full"
-				loading="lazy"
-			/>
+			<div
+				class="relative mt-30 lg:mt-10 lg:col-span-7 lg:overflow-hidden lg:rounded-2xl"
+			>
+				<img
+					src={imageIllustrationGraphique.src}
+					alt="Illustration graphique"
+					class="block h-auto w-full"
+					loading="lazy"
+				/>
 
-			<img
-				src={imageVinyl.src}
-				alt="Image vinyle"
-				class="absolute -top-16 left-0 z-0 block h-auto w-30"
-				loading="lazy"
-			/>
+				<img
+					src={imageVinyl.src}
+					alt="Image vinyle"
+					class="absolute -top-16 left-0 z-0 block h-auto w-30 lg:-top-10 lg:w-40"
+					loading="lazy"
+				/>
+			</div>
 		</div>
 
-		<section class="mt-20">
+		<section class="mt-20 lg:hidden">
 			<a
 				href="/programmation"
 				class="block bg-(--yellow) py-6 text-center text-black mx-10 ml-10 mr-10 mb-2"
@@ -145,12 +151,65 @@ const getPartenaireLogoUrl = partenaireLogoUrl;
 			</a>
 		</section>
 
+		<section class="hidden lg:block lg:mt-20">
+			<div class="grille">
+				<a
+					href="/programmation"
+					class="overflow-hidden rounded-2xl bg-(--yellow) text-black shadow-md transition hover:-translate-y-1 lg:col-span-4"
+				>
+					<div class="px-6 py-5 text-center">
+						<h3 class="leading-none">Programme</h3>
+					</div>
+					<img
+						src={imgProgramme.src}
+						alt="Programme"
+						class="block h-72 w-full object-cover"
+						loading="lazy"
+					/>
+				</a>
+
+				<a
+					href="/artistes"
+					class="overflow-hidden rounded-2xl bg-(--yellow) text-black shadow-md transition hover:-translate-y-1 lg:col-span-4"
+				>
+					<div class="px-6 py-5 text-center">
+						<h3 class="leading-none">Invités</h3>
+					</div>
+					<img
+						src={imgArtiste.src}
+						alt="Invités"
+						class="block h-72 w-full object-cover"
+						loading="lazy"
+					/>
+				</a>
+
+				<a
+					href="/infos-pratiques"
+					class="overflow-hidden rounded-2xl bg-(--yellow) text-black shadow-md transition hover:-translate-y-1 lg:col-span-4"
+				>
+					<div class="px-6 py-5 text-center">
+						<h3 class="leading-none">Infos pratiques</h3>
+					</div>
+					<img
+						src={imgInfosPratiques.src}
+						alt="Infos pratiques"
+						class="block h-72 w-full object-cover"
+						loading="lazy"
+					/>
+				</a>
+			</div>
+		</section>
+
 		<section class="mt-20">
-			<div class="py-8 text-center bg-(--red) mx-10 mb-10">
+			<div
+				class="py-8 text-center bg-(--red) mx-10 mb-10 lg:mx-0 lg:rounded-xl"
+			>
 				<h2 class="text-4xl leading-none">Partenaires</h2>
 			</div>
 
-			<div class="grid grid-cols-2 items-center gap-8 px-6 py-16">
+			<div
+				class="grid grid-cols-2 items-center gap-8 px-6 py-16 lg:flex lg:flex-wrap lg:items-center lg:justify-center lg:gap-10 lg:px-0 lg:py-10"
+			>
 				{
 					partenaires.length > 0 ? (
 						partenaires.map((partenaire) => (

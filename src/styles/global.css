@@ -78,6 +78,10 @@
     /* 52px */
     --space-texthero: 5rem;
     /* 80px */
+
+    --spacing-100: 100px;
+
+    --my-grid: repeat(12, minmax(0, 88px));
 }
 
 @layer base {
@@ -109,5 +113,21 @@
 
     p {
         font-size: var(--text-base);
+    }
+
+}
+
+@layer components {
+    .grille {
+        padding-inline: 1.5rem;
+    }
+
+    @media (min-width: 1024px) {
+        .grille {
+            display: grid;
+            grid-template-columns: var(--my-grid);
+            justify-content: center;
+            gap: 2rem;
+        }
     }
 }

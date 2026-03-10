@@ -1,11 +1,18 @@
 ---
 import heroImage from "../assets/hero.avif";
+import heroDesktopImage from "../assets/hero.desktop.avif";
 ---
 
-<section class="w-full bg-(--blue)">
-    <img
-        src={heroImage.src}
-        alt="Hero image"
-        class="mx-auto block h-auto w-full"
-    />
+<section
+    class="w-full bg-(--blue) lg:relative lg:left-1/2 lg:w-screen lg:max-w-none lg:-translate-x-1/2"
+>
+    <picture>
+        <source media="(min-width: 1024px)" srcset={heroDesktopImage.src} />
+        <img
+            src={heroImage.src}
+            alt="Hero image"
+            class="block h-auto w-full"
+            loading="eager"
+        />
+    </picture>
 </section>

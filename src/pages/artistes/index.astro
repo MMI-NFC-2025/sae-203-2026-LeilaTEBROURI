@@ -1,0 +1,98 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import PbImage from "../../components/PbImage.astro";
+import { allArtistesByDate } from "../../../backend/backend.mjs";
+
+const artistes = await allArtistesByDate();
+
+const artistesList = artistes.map((artiste) => {
+    const rawDateTime = String(artiste.date_performance ?? "");
+    const dateKey = rawDateTime.slice(0, 10);
+    const heure = rawDateTime.slice(11, 16);
+
+    const dateLabel = dateKey
+        ? new Date(`${dateKey}T00:00:00Z`).toLocaleDateString("fr-FR", {
+              weekday: "long",
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+              timeZone: "UTC",
+          })
+        : "Date non communiquée";
+
+    return {
+        id: String(artiste.id ?? ""),
+        nom: String(artiste.nom ?? "Artiste"),
+        scene: String(artiste.expand?.scene?.nom ?? ""),
+        dateLabel,
+        heure,
+        record: {
+            id: String(artiste.id ?? ""),
+            collectionName: "artiste",
+            img: artiste.img ? String(artiste.img) : "",
+        },
+    };
+});
+---
+
+<Layout>
+    <Header />
+    <main class="min-h-screen bg-(--blue) px-6 py-10 lg:pb-16">
+        <div
+            class="mx-auto mb-10 w-fit bg-(--red) px-8 py-5 text-center text-black"
+        >
+            <h2 class="leading-none">Artistes</h2>
+        </div>
+
+        <section class="space-y-4 lg:mx-auto lg:w-full lg:max-w-330">
+            {
+                artistesList.length > 0 ? (
+                    artistesList.map((artiste) => (
+                        <article class="bg-(--yellow) p-4 text-(--dark) lg:grid lg:grid-cols-12 lg:items-center lg:gap-4 lg:p-5">
+                            <div class="lg:col-span-3">
+                                <PbImage
+                                    record={artiste.record}
+                                    field="img"
+                                    alt={artiste.nom}
+                                    classImg="h-48 w-full object-cover lg:h-44"
+                                    size="600x600"
+                                />
+                            </div>
+
+                            <div class="mt-4 space-y-2 lg:col-span-7 lg:mt-0">
+                                <h3 class="text-2xl leading-tight">
+                                    {artiste.nom}
+                                </h3>
+                                <p class="text-base leading-tight">
+                                    {artiste.dateLabel}
+                                    {artiste.heure ? ` — ${artiste.heure}` : ""}
+                                </p>
+                                {artiste.scene && (
+                                    <p class="text-base leading-tight">
+                                        Scène : {artiste.scene}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div class="mt-4 lg:col-span-2 lg:mt-0 lg:text-right">
+                                <a
+                                    href={`/programmation/${artiste.id}`}
+                                    class="inline-block bg-(--red) px-4 py-2 text-(--dark)"
+                                >
+                                    Voir la fiche
+                                </a>
+                            </div>
+                        </article>
+                    ))
+                ) : (
+                    <p class="text-(--light) text-xl">
+                        Aucun artiste disponible.
+                    </p>
+                )
+            }
+        </section>
+    </main>
+    <Footer />
+</Layout>

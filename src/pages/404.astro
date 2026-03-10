@@ -1,0 +1,37 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<Layout>
+    <div class="min-h-screen bg-gray-200 flex flex-col">
+        <Header />
+        <main
+            class="flex-1 mt-10 mb-10 px-6 py-10 flex items-center lg:mt-100 lg:mb-100"
+        >
+            <section
+                class="mx-auto flex max-w-4xl flex-col items-center justify-center gap-8 text-center"
+            >
+                <h1 class="text-(--red) text-error leading-none">404</h1>
+
+                <h2 class="text-black text-5xl leading-tight uppercase">
+                    Oups ! Cette page n'existe pas.
+                </h2>
+
+                <p class="text-gray-600 text-2xl leading-tight">
+                    La page que vous recherchez a peut-être été supprimée ou son
+                    adresse a changé.
+                </p>
+
+                <a
+                    href="/"
+                    class="bg-(--yellow) px-10 py-4 text-(--dark) text-2xl"
+                >
+                    Retour à l'accueil
+                </a>
+            </section>
+        </main>
+        <Footer />
+    </div>
+</Layout>

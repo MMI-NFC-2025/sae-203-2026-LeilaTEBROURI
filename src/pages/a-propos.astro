@@ -15,24 +15,26 @@ const equipe = await homepageEquipe();
 
 <Layout>
     <Header />
-    <main class="min-h-screen bg-(--blue) pt-10 pb-10">
+    <main class="min-h-screen bg-(--blue) pt-10 pb-10 lg:pb-16">
         <div
             class="mx-auto w-fit bg-(--red) px-8 py-5 text-center text-black mb-10"
         >
             <h2 class="leading-none">À Propos</h2>
         </div>
-        <section class="h-100 w-full overflow-hidden">
+        <section class="mx-3 mb-20 w-auto lg:mx-auto lg:max-w-7xl">
             <PbImage
                 record={scenePrincipale}
                 field="img"
                 alt={scenePrincipale?.nom || "Scène principale"}
-                classImg="block h-11/12 w-full object-cover"
+                classImg="block h-56 w-full object-cover lg:h-72"
                 size="1600x0"
             />
         </section>
 
-        <section class="">
-            <div class="bg-(--yellow) p-7 text-(--dark) ml-3 mr-3">
+        <section class="lg:mx-auto lg:w-full lg:max-w-330">
+            <div
+                class="bg-(--yellow) p-7 text-(--dark) ml-3 mr-3 lg:mx-0 lg:p-10"
+            >
                 <p class="leading-tight">
                     Né de la volonté de valoriser les jumelages européens de
                     Montbéliard, Jumelages Festival réunit chaque été des
@@ -43,25 +45,29 @@ const equipe = await homepageEquipe();
             </div>
         </section>
 
-        <section>
+        <section class="lg:mx-auto lg:w-full lg:max-w-330">
             <div
                 class="mx-auto w-fit bg-(--red) px-8 py-5 text-center text-black mb-10 mt-15"
             >
                 <h2 class="leading-none">Equipe</h2>
             </div>
 
-            <div class="grid grid-cols-2 gap-6 px-4">
+            <div
+                class="grid grid-cols-2 gap-6 px-4 lg:grid lg:grid-cols-(--my-grid) lg:px-0"
+            >
                 {
                     equipe.length > 0 ? (
                         equipe.map((membre) => (
-                            <article class="text-center text-(--light)">
-                                <PbImage
-                                    record={membre}
-                                    field="img"
-                                    alt={membre.nom || "Membre équipe"}
-                                    classImg="h-40 w-full object-cover"
-                                    size="400x400"
-                                />
+                            <article class="text-center text-(--light) lg:col-span-4">
+                                <div class="w-full aspect-square overflow-hidden">
+                                    <PbImage
+                                        record={membre}
+                                        field="img"
+                                        alt={membre.nom || "Membre équipe"}
+                                        classImg="h-full w-full object-cover"
+                                        size="400x400"
+                                    />
+                                </div>
                                 <h3 class="mt-3 text-2xl leading-tight">
                                     {membre.nom}
                                 </h3>
@@ -78,8 +84,10 @@ const equipe = await homepageEquipe();
                 }
             </div>
         </section>
-        <section class="">
-            <div class="bg-(--yellow) p-7 text-(--dark) ml-3 mr-3 mt-10">
+        <section class="lg:mx-auto lg:w-full lg:max-w-330">
+            <div
+                class="bg-(--yellow) p-7 text-(--dark) ml-3 mr-3 mt-10 lg:mx-0 lg:p-10"
+            >
                 <p class="leading-tight">
                     Le festival est coordonné par une équipe mixte de
                     professionnels de l’événementiel et de bénévoles issus des
@@ -92,12 +100,14 @@ const equipe = await homepageEquipe();
         <img
             src={image3.src}
             alt="Image illustration"
-            class="mt-20 block h-auto w-full"
+            class="mt-20 block h-auto w-full lg:mx-auto lg:max-w-7xl"
             loading="lazy"
         />
 
-        <section class="">
-            <div class="bg-(--yellow) p-7 text-(--dark) ml-3 mr-3 mt-10">
+        <section class="lg:mx-auto lg:w-full lg:max-w-330">
+            <div
+                class="bg-(--yellow) p-7 text-(--dark) ml-3 mr-3 mt-10 lg:mx-0 lg:p-10"
+            >
                 <p class="leading-tight">
                     Jumelages Festival défend la découverte des cultures
                     régionales, l’ouverture européenne, la convivialité et

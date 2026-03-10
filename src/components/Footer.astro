@@ -2,9 +2,11 @@
 import mmiLogo from "../assets/logo_mmi.webp";
 ---
 
-<footer class="bg-amber-300 px-4 py-8 text-black">
-    <div class="mx-auto grid max-w-xl grid-cols-2 gap-8">
-        <div class="space-y-10">
+<footer class="bg-amber-300 px-4 py-8 text-black lg:px-10 lg:py-12">
+    <div
+        class="mx-auto grid max-w-xl grid-cols-2 gap-8 lg:max-w-7xl lg:grid-cols-12 lg:gap-10"
+    >
+        <div class="space-y-10 lg:col-span-7">
             <div class="space-y-1">
                 <h2 class="text-5xl uppercase">
                     Jumelages<br />
@@ -31,13 +33,18 @@ import mmiLogo from "../assets/logo_mmi.webp";
             </section>
         </div>
 
-        <div class="mt-33 flex flex-col items-start gap-6">
+        <div
+            class="mt-33 flex flex-col items-start gap-6 lg:col-span-5 lg:mt-0 lg:pt-10"
+        >
             <nav aria-label="Navigation footer">
                 <ul class="space-y-2 text-base leading-snug">
-                    <li><a href="/festival">Festival</a></li>
-                    <li><a href="/contact">Contact</a></li>
+                    <li><a href="/">Accueil</a></li>
                     <li><a href="/a-propos">À propos</a></li>
+                    <li><a href="/programmation">Programmation</a></li>
+                    <li><a href="/artistes">Artistes</a></li>
+                    <li><a href="/scene">Scène</a></li>
                     <li><a href="/infos-pratiques">Infos pratiques</a></li>
+                    <li><a href="/contact">Contact</a></li>
                 </ul>
             </nav>
 

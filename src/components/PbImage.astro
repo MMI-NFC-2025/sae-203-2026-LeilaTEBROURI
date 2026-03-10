@@ -19,9 +19,43 @@ const {
 
 const pb = getPocketBaseClient();
 const imageFieldValue = record?.[field];
-const imageUrl = imageFieldValue
-    ? pb.files.getURL(record, String(imageFieldValue), { thumb: size })
-    : null;
+
+function firstFileName(value: unknown): string {
+    if (Array.isArray(value)) {
+        return String(value[0] ?? "").trim();
+    }
+
+    if (typeof value !== "string") {
+        return "";
+    }
+
+    const trimmedValue = value.trim();
+
+    if (!trimmedValue) {
+        return "";
+    }
+
+    if (trimmedValue.startsWith("[") && trimmedValue.endsWith("]")) {
+        try {
+            const parsedValue = JSON.parse(trimmedValue);
+            if (Array.isArray(parsedValue)) {
+                return String(parsedValue[0] ?? "").trim();
+            }
+        } catch {}
+    }
+
+    if (trimmedValue.includes(",")) {
+        return trimmedValue.split(",")[0]?.trim() ?? "";
+    }
+
+    return trimmedValue;
+}
+
+const fileName = firstFileName(imageFieldValue);
+const imageUrl =
+    fileName && record
+        ? pb.files.getURL(record, fileName, { thumb: size })
+        : null;
 ---
 
 {
