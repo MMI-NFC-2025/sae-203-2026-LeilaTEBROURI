@@ -1,0 +1,102 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import PbImage from "../../components/PbImage.astro";
+import imageIllustrationGraphique from "../../assets/imageillustrationgraphique.avif";
+import {
+    homepageArtisteById,
+    homepageArtistesCarousel,
+} from "../../../backend/backend.mjs";
+
+const { id } = Astro.params;
+const artiste = await homepageArtisteById(id);
+const carouselArtistes = await homepageArtistesCarousel();
+---
+
+<Layout>
+    <Header />
+    <main class="min-h-screen bg-(--blue) px-6 py-10">
+        {
+            artiste ? (
+                <section class="space-y-6">
+                    <div class="mx-auto w-fit bg-(--red) px-8 py-5 text-center text-black">
+                        <h2 class="leading-none">{artiste.nom}</h2>
+                    </div>
+
+                    <PbImage
+                        record={artiste.record}
+                        field="img"
+                        alt={artiste.nom}
+                        classImg="block h-auto w-full object-cover"
+                        size="1200x0"
+                    />
+
+                    <div class="bg-(--yellow) p-5 text-(--dark)">
+                        <p class="text-xl leading-tight">
+                            {artiste.date} — {artiste.heure}
+                        </p>
+                        {artiste.scene && (
+                            <p class="mt-2 text-base leading-tight">
+                                Scène : {artiste.scene}
+                            </p>
+                        )}
+                        {artiste.genre && (
+                            <p class="mt-2 text-base leading-tight">
+                                Genre : {artiste.genre}
+                            </p>
+                        )}
+                    </div>
+
+                    <img
+                        src={imageIllustrationGraphique.src}
+                        alt="Illustration graphique"
+                        class="block h-auto w-full"
+                        loading="lazy"
+                    />
+
+                    {artiste.description && (
+                        <div class="bg-(--navyblue) p-6 text-(--light)">
+                            <p class="leading-tight">{artiste.description}</p>
+                        </div>
+                    )}
+
+                    <section class="space-y-4">
+                        <h3 class="text-(--light) text-3xl">Autres artistes</h3>
+
+                        <div class="flex gap-4 overflow-x-auto pb-2">
+                            {carouselArtistes.map((item) => (
+                                <a
+                                    href={`/programmation/${item.id}`}
+                                    class="block min-w-72 bg-(--yellow) p-4 text-(--dark)"
+                                >
+                                    <PbImage
+                                        record={item.record}
+                                        field="img"
+                                        alt={item.nom}
+                                        classImg="mb-3 h-36 w-full object-cover"
+                                        size="400x400"
+                                    />
+                                    <p class="text-xl leading-tight">
+                                        {item.nom}
+                                    </p>
+                                    {item.scene && (
+                                        <p class="mt-1 text-base leading-tight">
+                                            {item.scene}
+                                        </p>
+                                    )}
+                                    <p class="mt-1 text-base leading-tight">
+                                        {item.date} — {item.heure}
+                                    </p>
+                                </a>
+                            ))}
+                        </div>
+                    </section>
+                </section>
+            ) : (
+                <p class="text-(--light) text-xl">Artiste introuvable.</p>
+            )
+        }
+    </main>
+    <Footer />
+</Layout>

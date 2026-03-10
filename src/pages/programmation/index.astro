@@ -1,0 +1,64 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import PbImage from "../../components/PbImage.astro";
+import { homepageProgrammation } from "../../../backend/backend.mjs";
+
+const programmation = await homepageProgrammation();
+---
+
+<Layout>
+    <Header />
+    <main class="min-h-screen bg-(--blue) px-6 py-10">
+        <div
+            class="mx-auto w-fit bg-(--red) px-8 py-5 text-center text-black mb-10"
+        >
+            <h2 class="leading-none">Programme</h2>
+        </div>
+
+        <section class="space-y-8">
+            {
+                programmation.length > 0 ? (
+                    programmation.map((jour) => (
+                        <article class="space-y-4">
+                            <h3 class="text-(--light) text-3xl capitalize">
+                                {jour.label}
+                            </h3>
+
+                            <div class="space-y-3">
+                                {jour.items.map((artiste) => (
+                                    <a
+                                        href={`/programmation/${artiste.id}`}
+                                        class="block bg-(--yellow) p-4 text-(--dark)"
+                                    >
+                                        <PbImage
+                                            record={artiste.record}
+                                            field="img"
+                                            alt={artiste.nom}
+                                            classImg="mb-3 h-40 w-full object-cover"
+                                            size="400x400"
+                                        />
+                                        <p class="text-xl leading-tight">
+                                            {artiste.heure} — {artiste.nom}
+                                        </p>
+                                        {artiste.scene && (
+                                            <p class="mt-1 text-base leading-tight">
+                                                {artiste.scene}
+                                            </p>
+                                        )}
+                                    </a>
+                                ))}
+                            </div>
+                        </article>
+                    ))
+                ) : (
+                    <p class="text-(--light) text-xl">
+                        Aucune programmation disponible.
+                    </p>
+                )
+            }
+        </section>
+    </main>
+    <Footer />
+</Layout>

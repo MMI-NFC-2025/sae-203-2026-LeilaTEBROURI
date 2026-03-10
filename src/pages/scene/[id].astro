@@ -1,0 +1,97 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import PbImage from "../../components/PbImage.astro";
+import {
+    sceneById,
+    artistesBySceneId,
+    sceneImgUrl,
+} from "../../../backend/backend.mjs";
+
+const { id } = Astro.params;
+
+let scene = null;
+let artistes: Awaited<ReturnType<typeof artistesBySceneId>> = [];
+
+if (id) {
+    try {
+        scene = await sceneById(id);
+        artistes = await artistesBySceneId(id);
+    } catch {
+        scene = null;
+        artistes = [];
+    }
+}
+---
+
+<Layout>
+    <Header />
+    <main class="min-h-screen bg-(--blue) px-6 py-10">
+        {
+            scene ? (
+                <section class="space-y-6">
+                    <div class="mx-auto w-fit bg-(--red) px-8 py-5 text-center text-black">
+                        <h2 class="leading-none">{scene.nom}</h2>
+                    </div>
+
+                    {sceneImgUrl(scene) && (
+                        <img
+                            src={sceneImgUrl(scene)}
+                            alt={scene.nom}
+                            class="block h-auto w-full object-cover"
+                            loading="lazy"
+                        />
+                    )}
+
+                    <div class="bg-(--yellow) p-5 text-(--dark) space-y-2">
+                        <p class="text-base leading-tight">
+                            <strong>Localisation :</strong> {scene.localisation}
+                        </p>
+                        <p class="text-base leading-tight">
+                            <strong>Capacité :</strong> {scene.capacite}
+                        </p>
+                        <p class="text-base leading-tight">
+                            <strong>Description :</strong> {scene.description}
+                        </p>
+                    </div>
+
+                    <section class="space-y-4">
+                        <h3 class="text-(--light) text-3xl">
+                            Artistes de cette scène
+                        </h3>
+
+                        {artistes.length > 0 ? (
+                            <div class="space-y-3">
+                                {artistes.map((artiste) => (
+                                    <a
+                                        href={`/programmation/${artiste.id}`}
+                                        class="block bg-(--yellow) p-4 text-(--dark)"
+                                    >
+                                        <PbImage
+                                            record={artiste}
+                                            field="img"
+                                            alt={artiste.nom}
+                                            classImg="mb-3 h-40 w-full object-cover"
+                                            size="400x400"
+                                        />
+                                        <p class="text-xl leading-tight">
+                                            {artiste.nom ?? "Artiste"}
+                                        </p>
+                                    </a>
+                                ))}
+                            </div>
+                        ) : (
+                            <p class="text-(--light) text-xl">
+                                Aucun artiste programmé sur cette scène.
+                            </p>
+                        )}
+                    </section>
+                </section>
+            ) : (
+                <p class="text-(--light) text-xl">Scène introuvable.</p>
+            )
+        }
+    </main>
+    <Footer />
+</Layout>

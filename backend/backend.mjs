@@ -41,6 +41,117 @@ export async function allArtistesByDate() {
     });
 }
 
+/**
+ * @typedef {Object} HomepageProgrammationItem
+ * @property {string} id
+ * @property {string} nom
+ * @property {string} heure
+ * @property {string} scene
+ * @property {string} img
+ * @property {{ id: string, collectionName: string, img: string }} record
+ */
+
+/**
+ * @typedef {Object} HomepageProgrammationGroup
+ * @property {string} label
+ * @property {HomepageProgrammationItem[]} items
+ */
+
+
+
+// Programmation artistes prête pour le front (groupée par date + heure)
+export async function homepageProgrammation() {
+    try {
+        const artistes = await allArtistesByDate();
+
+        /** @type {Record<string, HomepageProgrammationGroup>} */
+        const groupedProgrammation = artistes.reduce((groups, artiste) => {
+            const rawDateTime = String(artiste.date_performance ?? "");
+            const dateKey = rawDateTime.slice(0, 10);
+            const heure = rawDateTime.slice(11, 16);
+
+            if (!dateKey) {
+                return groups;
+            }
+
+            if (!groups[dateKey]) {
+                const formattedDate = new Date(`${dateKey}T00:00:00Z`).toLocaleDateString("fr-FR", {
+                    weekday: "long",
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric",
+                    timeZone: "UTC"
+                });
+
+                groups[dateKey] = {
+                    label: formattedDate,
+                    items: []
+                };
+            }
+
+            groups[dateKey].items.push({
+                id: String(artiste.id ?? ""),
+                nom: String(artiste.nom ?? "Artiste"),
+                heure,
+                scene: String(artiste.expand?.scene?.nom ?? ""),
+                img: artiste.img ? String(artiste.img) : "",
+                record: {
+                    id: String(artiste.id ?? ""),
+                    collectionName: COLLECTIONS.artiste,
+                    img: artiste.img ? String(artiste.img) : ""
+                }
+            });
+
+            return groups;
+        }, {});
+
+        return Object.values(groupedProgrammation);
+    } catch {
+        /** @type {HomepageProgrammationGroup[]} */
+        return [];
+    }
+}
+
+
+
+// Liste artistes prête pour un carousel (date + heure + scène)
+export async function homepageArtistesCarousel() {
+    try {
+        const artistes = await allArtistesByDate();
+
+        return artistes.map((artiste) => {
+            const rawDateTime = String(artiste.date_performance ?? "");
+            const dateKey = rawDateTime.slice(0, 10);
+            const heure = rawDateTime.slice(11, 16);
+
+            const date = dateKey
+                ? new Date(`${dateKey}T00:00:00Z`).toLocaleDateString("fr-FR", {
+                    weekday: "long",
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric",
+                    timeZone: "UTC"
+                })
+                : "";
+
+            return {
+                id: String(artiste.id ?? ""),
+                nom: String(artiste.nom ?? "Artiste"),
+                scene: String(artiste.expand?.scene?.nom ?? ""),
+                date,
+                heure,
+                record: {
+                    id: String(artiste.id ?? ""),
+                    collectionName: COLLECTIONS.artiste,
+                    img: artiste.img ? String(artiste.img) : ""
+                }
+            };
+        });
+    } catch {
+        return [];
+    }
+}
+
 
 
 // Liste des scènes par nom
@@ -180,6 +291,50 @@ export async function artisteById(id) {
     return pb.collection(COLLECTIONS.artiste).getOne(id, {
         expand: "scene"
     });
+}
+
+
+
+// Détail artiste prêt pour le front
+export async function homepageArtisteById(id) {
+    try {
+        if (!id) {
+            return null;
+        }
+
+        const artiste = await artisteById(id);
+        const rawDateTime = String(artiste.date_performance ?? "");
+        const dateKey = rawDateTime.slice(0, 10);
+        const heure = rawDateTime.slice(11, 16);
+
+        const dateLabel = dateKey
+            ? new Date(`${dateKey}T00:00:00Z`).toLocaleDateString("fr-FR", {
+                weekday: "long",
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+                timeZone: "UTC"
+            })
+            : "";
+
+        return {
+            id: String(artiste.id ?? ""),
+            nom: String(artiste.nom ?? "Artiste"),
+            genre: String(artiste.genre ?? ""),
+            description: String(artiste.description ?? ""),
+            date: dateLabel,
+            heure,
+            scene: String(artiste.expand?.scene?.nom ?? ""),
+            img: artiste.img ? String(artiste.img) : "",
+            record: {
+                id: String(artiste.id ?? ""),
+                collectionName: COLLECTIONS.artiste,
+                img: artiste.img ? String(artiste.img) : ""
+            }
+        };
+    } catch {
+        return null;
+    }
 }
 
 

@@ -1,0 +1,50 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import { allScenesByName, sceneImgUrl } from "../../../backend/backend.mjs";
+
+const scenes = await allScenesByName();
+---
+
+<Layout>
+    <Header />
+    <main class="min-h-screen bg-(--blue) px-6 py-10">
+        <div
+            class="mx-auto mb-10 w-fit bg-(--red) px-8 py-5 text-center text-black"
+        >
+            <h2 class="leading-none">Scènes</h2>
+        </div>
+
+        <section class="space-y-4">
+            {
+                scenes.length > 0 ? (
+                    scenes.map((scene) => (
+                        <a
+                            href={`/scene/${scene.id}`}
+                            class="block bg-(--yellow) p-4 text-(--dark)"
+                        >
+                            {sceneImgUrl(scene) && (
+                                <img
+                                    src={sceneImgUrl(scene)}
+                                    alt={scene.nom}
+                                    class="mb-3 h-40 w-full object-cover"
+                                    loading="lazy"
+                                />
+                            )}
+                            <p class="text-xl leading-tight">{scene.nom}</p>
+                            <p class="mt-1 text-base leading-tight">
+                                {scene.localisation}
+                            </p>
+                        </a>
+                    ))
+                ) : (
+                    <p class="text-(--light) text-xl">
+                        Aucune scène disponible.
+                    </p>
+                )
+            }
+        </section>
+    </main>
+    <Footer />
+</Layout>

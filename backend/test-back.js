@@ -3,6 +3,9 @@ import {
     allScenesByName,
     allPartenairesByCreated,
     homepagePartenaires,
+    homepageProgrammation,
+    homepageArtistesCarousel,
+    homepageArtisteById,
     allArtistesAlphabet,
     artisteById,
     sceneById,
@@ -82,6 +85,24 @@ try {
 }
 
 
+// Test programmation format front
+try {
+    console.log("=== Programmation format front ===");
+    console.log(await homepageProgrammation());
+} catch (e) {
+    console.error(e);
+}
+
+
+// Test artistes carousel format front
+try {
+    console.log("=== Artistes carousel format front ===");
+    console.log(await homepageArtistesCarousel());
+} catch (e) {
+    console.error(e);
+}
+
+
 // Test artiste par ID
 try {
     console.log("=== Artiste par ID ===");
@@ -92,6 +113,21 @@ try {
     }
 
     console.log(await artisteById(artisteId));
+} catch (e) {
+    console.error(e);
+}
+
+
+// Test détail artiste format front par ID
+try {
+    console.log("=== Détail artiste format front ===");
+    const artisteId = artistesByDate[0]?.id;
+
+    if (!artisteId) {
+        throw new Error("Aucun ID artiste disponible.");
+    }
+
+    console.log(await homepageArtisteById(artisteId));
 } catch (e) {
     console.error(e);
 }
