@@ -1,0 +1,137 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { loginUser, logoutUser } from "../../backend/backend.mjs";
+
+let errorMessage = "";
+let successMessage = "";
+let emailValue = "";
+
+if (Astro.request.method === "POST") {
+    const data = await Astro.request.formData();
+    const action = String(data.get("action") ?? "login");
+
+    if (action === "logout") {
+        logoutUser();
+        Astro.cookies.delete("pb_user_token", { path: "/" });
+        Astro.cookies.delete("pb_user_email", { path: "/" });
+        successMessage = "Déconnexion effectuée.";
+    } else {
+        emailValue = String(data.get("email") ?? "").trim();
+        const password = String(data.get("password") ?? "").trim();
+
+        if (!emailValue || !password) {
+            errorMessage =
+                "Veuillez renseigner votre email et votre mot de passe.";
+        } else {
+            try {
+                const auth = await loginUser(emailValue, password);
+                Astro.cookies.set("pb_user_token", auth.token, {
+                    path: "/",
+                    httpOnly: true,
+                    sameSite: "lax",
+                });
+                Astro.cookies.set(
+                    "pb_user_email",
+                    String(auth.user?.email ?? emailValue),
+                    {
+                        path: "/",
+                        sameSite: "lax",
+                    },
+                );
+                successMessage =
+                    "Connexion réussie. Vous pouvez maintenant gérer les données.";
+            } catch {
+                errorMessage =
+                    "Connexion impossible. Vérifiez vos identifiants users.";
+            }
+        }
+    }
+}
+
+const connectedEmail = Astro.cookies.get("pb_user_email")?.value ?? "";
+---
+
+<Layout>
+    <Header />
+    <main class="min-h-screen bg-(--blue) px-6 py-10 lg:pb-16">
+        <section class="mx-auto w-full max-w-3xl space-y-6">
+            <div
+                class="mx-auto w-fit bg-(--red) px-8 py-5 text-center text-black"
+            >
+                <h2 class="leading-none">Connexion</h2>
+            </div>
+
+            {
+                successMessage && (
+                    <p class="bg-(--yellow) p-4 text-(--dark)">
+                        {successMessage}
+                    </p>
+                )
+            }
+            {
+                errorMessage && (
+                    <p class="bg-(--red) p-4 text-black">{errorMessage}</p>
+                )
+            }
+
+            {
+                connectedEmail ? (
+                    <div class="space-y-4 bg-(--navyblue) p-6 text-(--light)">
+                        <p>Connecté en tant que : {connectedEmail}</p>
+                        <a
+                            href="/gestion"
+                            class="inline-block bg-(--yellow) px-5 py-3 text-(--dark)"
+                        >
+                            Aller à la gestion des données
+                        </a>
+                        <form method="POST" class="pt-2">
+                            <input type="hidden" name="action" value="logout" />
+                            <button
+                                type="submit"
+                                class="bg-(--light) px-5 py-3 text-(--dark)"
+                            >
+                                Se déconnecter
+                            </button>
+                        </form>
+                    </div>
+                ) : (
+                    <form
+                        method="POST"
+                        class="space-y-4 bg-(--navyblue) p-6 text-(--light)"
+                    >
+                        <label class="block">
+                            <span class="mb-2 block">Email</span>
+                            <input
+                                type="email"
+                                name="email"
+                                required
+                                value={emailValue}
+                                class="w-full bg-(--light) px-4 py-3 text-(--dark)"
+                            />
+                        </label>
+
+                        <label class="block">
+                            <span class="mb-2 block">Mot de passe</span>
+                            <input
+                                type="password"
+                                name="password"
+                                required
+                                class="w-full bg-(--light) px-4 py-3 text-(--dark)"
+                            />
+                        </label>
+
+                        <button
+                            type="submit"
+                            class="bg-(--yellow) px-6 py-3 text-(--dark)"
+                        >
+                            Se connecter
+                        </button>
+                    </form>
+                )
+            }
+        </section>
+    </main>
+    <Footer />
+</Layout>

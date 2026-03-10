@@ -1,0 +1,258 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import {
+    allScenesByName,
+    addArtiste,
+    updateArtiste,
+    addScene,
+    updateScene,
+} from "../../backend/backend.mjs";
+
+const token = Astro.cookies.get("pb_user_token")?.value ?? "";
+const scenes = await allScenesByName();
+
+let message = "";
+let errorMessage = "";
+
+if (Astro.request.method === "POST") {
+    if (!token) {
+        errorMessage = "Vous devez être connecté pour modifier les données.";
+    } else {
+        const data = await Astro.request.formData();
+        const formType = String(data.get("formType") ?? "");
+
+        try {
+            if (formType === "artiste") {
+                const id = String(data.get("id") ?? "").trim();
+                const payload = {
+                    nom: String(data.get("nom") ?? "").trim(),
+                    genre: String(data.get("genre") ?? "").trim(),
+                    description: String(data.get("description") ?? "").trim(),
+                    date_performance: String(
+                        data.get("date_performance") ?? "",
+                    ).trim(),
+                    scene: String(data.get("scene") ?? "").trim(),
+                };
+
+                if (id) {
+                    await updateArtiste(id, payload);
+                } else {
+                    await addArtiste(payload);
+                }
+                message = id
+                    ? "Artiste mis à jour avec succès."
+                    : "Artiste ajouté avec succès.";
+            }
+
+            if (formType === "scene") {
+                const id = String(data.get("id") ?? "").trim();
+                const capaciteRaw = String(data.get("capacite") ?? "").trim();
+                const payload = {
+                    nom: String(data.get("nom") ?? "").trim(),
+                    description: String(data.get("description") ?? "").trim(),
+                    localisation: String(data.get("localisation") ?? "").trim(),
+                    capacite: capaciteRaw ? Number(capaciteRaw) : null,
+                };
+
+                if (id) {
+                    await updateScene(id, payload);
+                } else {
+                    await addScene(payload);
+                }
+                message = id
+                    ? "Scène mise à jour avec succès."
+                    : "Scène ajoutée avec succès.";
+            }
+        } catch (error) {
+            errorMessage = `Erreur PocketBase : ${error instanceof Error ? error.message : "opération impossible."}`;
+        }
+    }
+}
+---
+
+<Layout>
+    <Header />
+    <main class="min-h-screen bg-(--blue) px-6 py-10 lg:pb-16">
+        <section class="mx-auto w-full max-w-6xl space-y-6">
+            <div
+                class="mx-auto w-fit bg-(--red) px-8 py-5 text-center text-black"
+            >
+                <h2 class="leading-none">Gestion des données</h2>
+            </div>
+
+            {
+                !token && (
+                    <p class="bg-(--yellow) p-4 text-(--dark)">
+                        Vous devez vous connecter sur
+                        <a href="/connexion" class="underline">
+                            la page connexion
+                        </a>
+                        pour ajouter ou modifier des données.
+                    </p>
+                )
+            }
+
+            {
+                message && (
+                    <p class="bg-(--yellow) p-4 text-(--dark)">{message}</p>
+                )
+            }
+            {
+                errorMessage && (
+                    <p class="bg-(--red) p-4 text-black">{errorMessage}</p>
+                )
+            }
+
+            <div class="grid gap-6 lg:grid-cols-2">
+                <form
+                    method="POST"
+                    class="space-y-4 bg-(--navyblue) p-6 text-(--light)"
+                >
+                    <input type="hidden" name="formType" value="artiste" />
+                    <h3 class="text-2xl">Ajouter / modifier un artiste</h3>
+                    <p class="text-sm">
+                        Laisser ID vide pour créer un nouvel artiste.
+                    </p>
+
+                    <label class="block">
+                        <span class="mb-2 block">ID artiste (optionnel)</span>
+                        <input
+                            type="text"
+                            name="id"
+                            class="w-full bg-(--light) px-4 py-3 text-(--dark)"
+                        />
+                    </label>
+
+                    <label class="block">
+                        <span class="mb-2 block">Nom</span>
+                        <input
+                            type="text"
+                            name="nom"
+                            required
+                            class="w-full bg-(--light) px-4 py-3 text-(--dark)"
+                        />
+                    </label>
+
+                    <label class="block">
+                        <span class="mb-2 block">Genre</span>
+                        <input
+                            type="text"
+                            name="genre"
+                            class="w-full bg-(--light) px-4 py-3 text-(--dark)"
+                        />
+                    </label>
+
+                    <label class="block">
+                        <span class="mb-2 block">Description</span>
+                        <textarea
+                            name="description"
+                            rows="4"
+                            class="w-full bg-(--light) px-4 py-3 text-(--dark)"
+                        ></textarea>
+                    </label>
+
+                    <label class="block">
+                        <span class="mb-2 block">Date de performance</span>
+                        <input
+                            type="datetime-local"
+                            name="date_performance"
+                            class="w-full bg-(--light) px-4 py-3 text-(--dark)"
+                        />
+                    </label>
+
+                    <label class="block">
+                        <span class="mb-2 block">Scène</span>
+                        <select
+                            name="scene"
+                            class="w-full bg-(--light) px-4 py-3 text-(--dark)"
+                        >
+                            <option value="">Choisir une scène</option>
+                            {
+                                scenes.map((scene) => (
+                                    <option value={scene.id}>
+                                        {scene.nom}
+                                    </option>
+                                ))
+                            }
+                        </select>
+                    </label>
+
+                    <button
+                        type="submit"
+                        class="bg-(--yellow) px-6 py-3 text-(--dark)"
+                    >
+                        Enregistrer artiste
+                    </button>
+                </form>
+
+                <form
+                    method="POST"
+                    class="space-y-4 bg-(--navyblue) p-6 text-(--light)"
+                >
+                    <input type="hidden" name="formType" value="scene" />
+                    <h3 class="text-2xl">Ajouter / modifier une scène</h3>
+                    <p class="text-sm">
+                        Laisser ID vide pour créer une nouvelle scène.
+                    </p>
+
+                    <label class="block">
+                        <span class="mb-2 block">ID scène (optionnel)</span>
+                        <input
+                            type="text"
+                            name="id"
+                            class="w-full bg-(--light) px-4 py-3 text-(--dark)"
+                        />
+                    </label>
+
+                    <label class="block">
+                        <span class="mb-2 block">Nom</span>
+                        <input
+                            type="text"
+                            name="nom"
+                            required
+                            class="w-full bg-(--light) px-4 py-3 text-(--dark)"
+                        />
+                    </label>
+
+                    <label class="block">
+                        <span class="mb-2 block">Description</span>
+                        <textarea
+                            name="description"
+                            rows="4"
+                            class="w-full bg-(--light) px-4 py-3 text-(--dark)"
+                        ></textarea>
+                    </label>
+
+                    <label class="block">
+                        <span class="mb-2 block">Localisation</span>
+                        <input
+                            type="text"
+                            name="localisation"
+                            class="w-full bg-(--light) px-4 py-3 text-(--dark)"
+                        />
+                    </label>
+
+                    <label class="block">
+                        <span class="mb-2 block">Capacité</span>
+                        <input
+                            type="number"
+                            name="capacite"
+                            min="0"
+                            class="w-full bg-(--light) px-4 py-3 text-(--dark)"
+                        />
+                    </label>
+
+                    <button
+                        type="submit"
+                        class="bg-(--yellow) px-6 py-3 text-(--dark)"
+                    >
+                        Enregistrer scène
+                    </button>
+                </form>
+            </div>
+        </section>
+    </main>
+    <Footer />
+</Layout>
