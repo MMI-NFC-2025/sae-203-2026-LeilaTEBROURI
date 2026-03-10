@@ -4,10 +4,19 @@ import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
 import PbImage from "../../components/PbImage.astro";
 import imageIllustrationGraphique from "../../assets/imageillustrationgraphique.avif";
-import { homepageArtisteById } from "../../../backend/backend.mjs";
+import {
+    homepageArtisteById,
+    homepageArtistesCarousel,
+} from "../../../backend/backend.mjs";
 
 const { id } = Astro.params;
 const artiste = await homepageArtisteById(id);
+const artistesCarousel = (await homepageArtistesCarousel()).filter(
+    (item) => item.id !== id,
+);
+const artisteImages = Array.isArray(artiste?.imageUrls)
+    ? artiste.imageUrls.slice(0, 3)
+    : [];
 ---
 
 <Layout>
@@ -20,13 +29,62 @@ const artiste = await homepageArtisteById(id);
                         <h2 class="leading-none">{artiste.nom}</h2>
                     </div>
 
-                    <PbImage
-                        record={artiste.record}
-                        field="img"
-                        alt={artiste.nom}
-                        classImg="block h-auto w-full object-cover lg:max-h-160"
-                        size="1200x0"
-                    />
+                    {artisteImages.length > 0 ? (
+                        <div class="relative">
+                            <button
+                                id="artiste-images-prev"
+                                type="button"
+                                class="absolute left-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-(--navyblue) text-(--light) transition hover:bg-(--red) hover:text-black"
+                                aria-label="Image précédente"
+                            >
+                                <span
+                                    aria-hidden="true"
+                                    class="text-2xl leading-none"
+                                >
+                                    ‹
+                                </span>
+                            </button>
+
+                            <div
+                                id="artiste-images-carousel"
+                                class="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2"
+                                aria-label="Carousel images artiste"
+                            >
+                                {artisteImages.map((imageUrl) => (
+                                    <div class="w-full shrink-0 snap-start">
+                                        <img
+                                            src={imageUrl}
+                                            alt={artiste.nom}
+                                            class="block h-auto w-full object-cover lg:max-h-160"
+                                            loading="lazy"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+
+                            <button
+                                id="artiste-images-next"
+                                type="button"
+                                class="absolute right-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-(--navyblue) text-(--light) transition hover:bg-(--red) hover:text-black"
+                                aria-label="Image suivante"
+                            >
+                                <span
+                                    aria-hidden="true"
+                                    class="text-2xl leading-none"
+                                >
+                                    ›
+                                </span>
+                            </button>
+                        </div>
+                    ) : (
+                        <PbImage
+                            record={artiste.record}
+                            field="img"
+                            alt={artiste.nom}
+                            classImg="block h-auto w-full object-cover lg:max-h-160"
+                            size="1200x0"
+                        />
+                    )}
 
                     <div class="bg-(--yellow) p-5 text-(--dark) lg:p-8">
                         <p class="text-xl leading-tight">
@@ -56,6 +114,34 @@ const artiste = await homepageArtisteById(id);
                             <p class="leading-tight">{artiste.description}</p>
                         </div>
                     )}
+
+                    {artistesCarousel.length > 0 && (
+                        <section class="space-y-4">
+                            <div class="mx-auto w-fit bg-(--red) px-6 py-3 text-center text-black">
+                                <h3 class="leading-none">Autres artistes</h3>
+                            </div>
+
+                            <div class="flex gap-4 overflow-x-auto pb-2">
+                                {artistesCarousel.map((item) => (
+                                    <a
+                                        href={`/programmation/${item.id}`}
+                                        class="min-w-64 bg-(--yellow) p-3 text-(--dark) lg:min-w-80"
+                                    >
+                                        <PbImage
+                                            record={item.record}
+                                            field="img"
+                                            alt={item.nom}
+                                            classImg="h-44 w-full object-cover"
+                                            size="600x600"
+                                        />
+                                        <p class="mt-3 text-xl leading-tight">
+                                            {item.nom}
+                                        </p>
+                                    </a>
+                                ))}
+                            </div>
+                        </section>
+                    )}
                 </section>
             ) : (
                 <p class="text-(--light) text-xl">Artiste introuvable.</p>
@@ -64,3 +150,25 @@ const artiste = await homepageArtisteById(id);
     </main>
     <Footer />
 </Layout>
+
+<script is:inline>
+    const carousel = document.getElementById("artiste-images-carousel");
+    const prevButton = document.getElementById("artiste-images-prev");
+    const nextButton = document.getElementById("artiste-images-next");
+
+    if (carousel && prevButton && nextButton) {
+        prevButton.addEventListener("click", () => {
+            carousel.scrollBy({
+                left: -carousel.clientWidth,
+                behavior: "smooth",
+            });
+        });
+
+        nextButton.addEventListener("click", () => {
+            carousel.scrollBy({
+                left: carousel.clientWidth,
+                behavior: "smooth",
+            });
+        });
+    }
+</script>

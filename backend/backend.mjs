@@ -345,6 +345,16 @@ export async function homepageArtisteById(id) {
             })
             : "";
 
+        const imageFiles = Array.isArray(artiste.img)
+            ? artiste.img.map((file) => String(file ?? "").trim()).filter(Boolean)
+            : artiste.img
+                ? [String(artiste.img).trim()].filter(Boolean)
+                : [];
+
+        const imageUrls = imageFiles.map(
+            (fileName) => `${POCKETBASE_URL}/api/files/${COLLECTIONS.artiste}/${String(artiste.id ?? "")}/${fileName}?thumb=1200x0`
+        );
+
         return {
             id: String(artiste.id ?? ""),
             nom: String(artiste.nom ?? "Artiste"),
@@ -353,11 +363,12 @@ export async function homepageArtisteById(id) {
             date: dateLabel,
             heure,
             scene: String(artiste.expand?.scene?.nom ?? ""),
-            img: artiste.img ? String(artiste.img) : "",
+            img: imageFiles,
+            imageUrls,
             record: {
                 id: String(artiste.id ?? ""),
                 collectionName: COLLECTIONS.artiste,
-                img: artiste.img ? String(artiste.img) : ""
+                img: imageFiles
             }
         };
     } catch {
