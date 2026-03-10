@@ -1,0 +1,112 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<Layout>
+    <Header />
+    <main class="min-h-screen bg-(--blue) px-6 py-10">
+        <div
+            class="mx-auto mb-10 w-fit bg-(--red) px-8 py-5 text-center text-black"
+        >
+            <h2 class="leading-none">Contact</h2>
+        </div>
+
+        <section class="mx-auto bg-(--red) p-6 md:p-8">
+            <p class="mb-8 text-black">Une question sur le festival ?</p>
+            <p class="mb-10">Envoie-nous ton message.</p>
+
+            <form
+                name="contact"
+                method="POST"
+                data-netlify="true"
+                netlify-honeypot="bot-field"
+                class="space-y-9"
+            >
+                <input type="hidden" name="form-name" value="contact" />
+                <p class="hidden">
+                    <label>
+                        Ne pas remplir ce champ :
+                        <input name="bot-field" />
+                    </label>
+                </p>
+
+                <div class="space-y-9">
+                    <label class="block">
+                        <span class="mb-4 block leading-none text-black"
+                            >Nom</span
+                        >
+                        <input
+                            type="text"
+                            name="nom"
+                            required
+                            placeholder="Indiquer votre demande"
+                            class="w-full bg-gray-100 px-8 py-6 text-black placeholder:text-gray-700/90 focus:outline-none"
+                        />
+                    </label>
+
+                    <label class="block">
+                        <span class="mb-4 block leading-none text-black"
+                            >Mail</span
+                        >
+                        <input
+                            type="email"
+                            name="email"
+                            required
+                            placeholder="Indiquer votre mail"
+                            class="w-full bg-gray-100 px-8 py-6 text-black placeholder:text-gray-700/90 focus:outline-none"
+                        />
+                    </label>
+
+                    <label class="block">
+                        <span class="mb-4 block leading-none text-black"
+                            >Sujet</span
+                        >
+                        <input
+                            type="text"
+                            name="sujet"
+                            required
+                            placeholder="Décrivez votre sujet"
+                            class="w-full bg-gray-100 px-8 py-6 text-black placeholder:text-gray-700/90 focus:outline-none"
+                        />
+                    </label>
+                </div>
+
+                <label class="block">
+                    <span class="mb-4 block leading-none text-black"
+                        >Message</span
+                    >
+                    <textarea
+                        name="message"
+                        required
+                        rows="8"
+                        placeholder="..."
+                        class="w-full bg-gray-100 px-8 py-6 text-black placeholder:text-gray-700/90 focus:outline-none"
+                    ></textarea>
+                </label>
+
+                <label class="flex items-start gap-3 text-black">
+                    <input
+                        type="checkbox"
+                        name="consentement"
+                        required
+                        class="mt-1 h-5 w-5"
+                    />
+                    <span>
+                        J’accepte que mes données soient utilisées uniquement
+                        pour répondre à ma demande. *
+                    </span>
+                </label>
+
+                <button
+                    type="submit"
+                    class="bg-(--yellow) px-10 py-4 text-black"
+                >
+                    Envoyer le message
+                </button>
+            </form>
+        </section>
+    </main>
+    <Footer />
+</Layout>

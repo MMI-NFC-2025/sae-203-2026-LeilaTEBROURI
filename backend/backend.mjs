@@ -8,6 +8,7 @@ const COLLECTIONS = {
     scene: "scene",
     equipe: "equipe",
     partenaire: "partenaire",
+    faq: "faq",
     users: "users"
 };
 
@@ -183,6 +184,33 @@ export async function homepagePartenaires() {
             nom: String(partenaire.nom ?? ""),
             lien: partenaire.lien ? String(partenaire.lien) : undefined,
             logo: partenaire.logo ? String(partenaire.logo) : undefined
+        }));
+    } catch {
+        return [];
+    }
+}
+
+
+
+// Liste FAQ triée par création
+export async function allFaqByCreated() {
+    return pb.collection(COLLECTIONS.faq).getFullList({
+        sort: "created",
+        fields: "id,question,reponse"
+    });
+}
+
+
+
+// FAQ prête pour le front
+export async function homepageFaq() {
+    try {
+        const records = await allFaqByCreated();
+
+        return records.map((item) => ({
+            id: String(item.id ?? ""),
+            question: String(item.question ?? ""),
+            reponse: String(item.reponse ?? "")
         }));
     } catch {
         return [];

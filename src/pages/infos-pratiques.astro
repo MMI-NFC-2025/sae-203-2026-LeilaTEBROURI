@@ -2,13 +2,104 @@
 import Layout from "../layouts/Layout.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import { homepageFaq } from "../../backend/backend.mjs";
+
+type FaqItem = {
+    id: string;
+    question: string;
+    reponse: string;
+};
+
+const faqItems = (await homepageFaq()) as FaqItem[];
 ---
 
 <Layout>
     <Header />
     <main class="min-h-screen bg-(--blue) px-6 py-10">
-        <h1 class="text-5xl leading-none">Infos pratiques</h1>
-        <p class="mt-6 text-xl">Page en construction.</p>
+        <div
+            class="mx-auto mb-10 w-fit bg-(--red) px-8 py-5 text-center text-black"
+        >
+            <h2 class="leading-none">Infos pratiques</h2>
+        </div>
+
+        <div
+            class="mx-auto mb-10 w-fit bg-(--yellow) px-8 py-5 text-center text-black mt-20"
+        >
+            <h3 class="leading-none">Tarifs</h3>
+        </div>
+        <section class="">
+            <div class="bg-(--navyblue) p-7 text-(--light) ml-2 mr-2">
+                <p class="leading-tight">
+                    Le festival propose plusieurs formules : pass 1 jour et pass
+                    3 jours, avec tarif réduit pour les étudiants, les
+                    demandeurs d’emploi et les moins de 18 ans sur présentation
+                    d’un justificatif. L’accès au parc reste libre en journée
+                    pour les animations gratuites.
+                </p>
+            </div>
+        </section>
+
+        <div
+            class="mx-auto mb-10 w-fit bg-(--yellow) px-8 py-5 text-center text-black mt-20"
+        >
+            <h3 class="leading-none">Hébergement</h3>
+        </div>
+        <section class="">
+            <div class="bg-(--navyblue) p-7 text-(--light) ml-2 mr-2">
+                <p class="leading-tight">
+                    Retrouvez une sélection d’hébergements à proximité du Parc
+                    du Prés‑la‑Rose : hôtels, campings, gîtes et auberges de
+                    jeunesse sur Montbéliard et l’agglomération. Pensez à
+                    réserver tôt, la période estivale est très demandée.
+                </p>
+            </div>
+        </section>
+
+        <div
+            class="mx-auto mb-10 w-fit bg-(--yellow) px-8 py-5 text-center text-black mt-20"
+        >
+            <h3 class="leading-none">Transport</h3>
+        </div>
+        <section class="">
+            <div class="bg-(--navyblue) p-7 text-(--light) ml-2 mr-2">
+                <p class="leading-tight">
+                    Le site est accessible en train (gare de Montbéliard), en
+                    bus urbain et en voiture avec plusieurs parkings à
+                    proximité. Des solutions de covoiturage sont encouragées et
+                    des parkings vélos sont disponibles aux entrées du parc.
+                </p>
+            </div>
+        </section>
+
+        <div
+            class="mx-auto mb-10 w-fit bg-(--yellow) px-8 py-5 text-center text-black mt-20"
+        >
+            <h3 class="leading-none">FAQ</h3>
+        </div>
+
+        <section class="mx-2">
+            {
+                faqItems.length > 0 ? (
+                    <div class="space-y-3">
+                        {faqItems.map((item) => (
+                            <details class="group overflow-hidden rounded-2xl bg-(--navyblue) text-(--light) shadow-md transition-all duration-200">
+                                <summary class="flex cursor-pointer list-none items-center justify-between px-5 py-4 text-xl leading-tight">
+                                    <span>{item.question}</span>
+                                    <span class="text-2xl leading-none transition-transform duration-200 group-open:rotate-45">
+                                        +
+                                    </span>
+                                </summary>
+                                <div class="border-t border-white/20 px-5 pb-5 pt-4">
+                                    <p class="leading-tight">{item.reponse}</p>
+                                </div>
+                            </details>
+                        ))}
+                    </div>
+                ) : (
+                    <p class="text-(--light) text-xl">Aucune FAQ disponible.</p>
+                )
+            }
+        </section>
     </main>
     <Footer />
 </Layout>
