@@ -42,6 +42,10 @@
     /* 32px */
     --text-4xl: 2.25rem;
     /* 36px */
+    --text-h1: 3.4375rem;
+    /* 55px */
+    --text-h2: 2.1875rem;
+    /* 35px */
     --text-5xl: 3rem;
     /* 48px */
     --text-6xl: 3.75rem;
@@ -100,15 +104,15 @@
     }
 
     h1 {
-        font-size: 3.4375rem;
+        font-size: var(--text-h1);
     }
 
     h2 {
-        font-size: 2.1875rem;
+        font-size: var(--text-h2);
     }
 
     h3 {
-        font-size: 1.875rem;
+        font-size: var(--text-3xl);
     }
 
     p {
