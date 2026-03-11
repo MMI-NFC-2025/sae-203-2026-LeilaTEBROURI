@@ -2,6 +2,56 @@
 import "@fontsource/barrio";
 import "@fontsource-variable/inter";
 import "../styles/global.css";
+
+const pathname = Astro.url.pathname;
+const segments = pathname.split("/").filter(Boolean);
+const pageBySegment: Record<string, string> = {
+	"a-propos": "À propos",
+	artistes: "Artistes",
+	connexion: "Connexion",
+	contact: "Contact",
+	gestion: "Gestion",
+	"infos-pratiques": "Infos pratiques",
+	inscription: "Inscription",
+	programmation: "Programmation",
+	scene: "Scène",
+};
+
+const descriptionBySegment: Record<string, string> = {
+	"a-propos":
+		"Découvrez le projet Jumelages Festival et l'équipe qui organise cet événement musical à Montbéliard.",
+	artistes:
+		"Retrouvez les artistes du Jumelages Festival et découvrez leur univers musical.",
+	connexion: "Connectez-vous à votre espace Jumelages Festival.",
+	contact: "Contactez l'équipe du Jumelages Festival pour toute question.",
+	gestion: "Espace de gestion du Jumelages Festival.",
+	"infos-pratiques":
+		"Consultez les informations pratiques du Jumelages Festival : accès, horaires et conseils.",
+	inscription:
+		"Créez votre compte pour accéder aux services du Jumelages Festival.",
+	programmation:
+		"Consultez la programmation du Jumelages Festival et préparez votre venue.",
+	scene: "Découvrez les scènes du Jumelages Festival et les artistes programmés.",
+};
+
+const firstSegment = segments[0] ?? "";
+const mappedTitle =
+	firstSegment in pageBySegment ? pageBySegment[firstSegment] : undefined;
+
+const title =
+	segments.length === 0
+		? "Accueil"
+		: (mappedTitle ??
+			firstSegment
+				.split("-")
+				.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+				.join(" "));
+
+const description =
+	segments.length === 0
+		? "Jumelages Festival : découvrez la programmation, les artistes, les scènes et les informations pratiques."
+		: (descriptionBySegment[firstSegment] ??
+			"Découvrez le Jumelages Festival : programmation, artistes, scènes et informations pratiques.");
 ---
 
 <!doctype html>
@@ -12,7 +62,8 @@ import "../styles/global.css";
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
+		<meta name="description" content={description} />
+		<title>{title}</title>
 	</head>
 	<body>
 		<slot />
