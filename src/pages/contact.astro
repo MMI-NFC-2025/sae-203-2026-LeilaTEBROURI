@@ -2,6 +2,62 @@
 import Layout from "../layouts/Layout.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import { addContactMessage } from "../../backend/backend.mjs";
+
+let successMessage = "";
+let errorMessage = "";
+
+let nom = "";
+let email = "";
+let sujet = "";
+let message = "";
+
+if (Astro.request.method === "POST") {
+    const data = await Astro.request.formData();
+
+    const botField = String(data.get("bot-field") ?? "").trim();
+    nom = String(data.get("nom") ?? "").trim();
+    email = String(data.get("email") ?? "").trim();
+    sujet = String(data.get("sujet") ?? "").trim();
+    message = String(data.get("message") ?? "").trim();
+    const consentement = data.get("consentement") === "on";
+
+    if (botField) {
+        successMessage = "Message envoyé.";
+    } else if (!nom || !email || !sujet || !message || !consentement) {
+        errorMessage =
+            "Merci de remplir tous les champs et d’accepter le consentement.";
+    } else {
+        try {
+            await addContactMessage({
+                Nom: nom,
+                Mail: email,
+                Sujet: sujet,
+                Message: message,
+                Consentement: consentement,
+            });
+
+            successMessage = "Merci, votre message a bien été envoyé.";
+            nom = "";
+            email = "";
+            sujet = "";
+            message = "";
+        } catch (error) {
+            const messageText =
+                error instanceof Error ? error.message : String(error ?? "");
+
+            if (
+                messageText.includes("Only superusers can perform this action")
+            ) {
+                errorMessage =
+                    "Configuration PocketBase: autorise la règle Create de la collection contact.";
+            } else {
+                errorMessage =
+                    "Impossible d’envoyer le message pour le moment.";
+            }
+        }
+    }
+}
 ---
 
 <Layout>
@@ -24,11 +80,9 @@ import Footer from "../components/Footer.astro";
             <form
                 name="contact"
                 method="POST"
-                data-netlify="true"
-                netlify-honeypot="bot-field"
+                action="/contact"
                 class="space-y-9"
             >
-                <input type="hidden" name="form-name" value="contact" />
                 <p class="hidden">
                     <label>
                         Ne pas remplir ce champ :
@@ -46,6 +100,7 @@ import Footer from "../components/Footer.astro";
                         <input
                             type="text"
                             name="nom"
+                            value={nom}
                             required
                             placeholder="Indiquer votre demande"
                             class="w-full bg-gray-100 px-8 py-6 text-black placeholder:text-gray-700/90 focus:outline-none"
@@ -59,6 +114,7 @@ import Footer from "../components/Footer.astro";
                         <input
                             type="email"
                             name="email"
+                            value={email}
                             required
                             placeholder="Indiquer votre mail"
                             class="w-full bg-gray-100 px-8 py-6 text-black placeholder:text-gray-700/90 focus:outline-none"
@@ -72,6 +128,7 @@ import Footer from "../components/Footer.astro";
                         <input
                             type="text"
                             name="sujet"
+                            value={sujet}
                             required
                             placeholder="Décrivez votre sujet"
                             class="w-full bg-gray-100 px-8 py-6 text-black placeholder:text-gray-700/90 focus:outline-none"
@@ -89,7 +146,8 @@ import Footer from "../components/Footer.astro";
                         rows="8"
                         placeholder="..."
                         class="w-full bg-gray-100 px-8 py-6 text-black placeholder:text-gray-700/90 focus:outline-none"
-                    ></textarea>
+                        >{message}</textarea
+                    >
                 </label>
 
                 <label class="flex items-start gap-3 text-black">
@@ -111,6 +169,22 @@ import Footer from "../components/Footer.astro";
                 >
                     Envoyer le message
                 </button>
+
+                {
+                    successMessage && (
+                        <p class="bg-(--yellow) px-6 py-4 text-(--dark)">
+                            {successMessage}
+                        </p>
+                    )
+                }
+
+                {
+                    errorMessage && (
+                        <p class="bg-(--red) px-6 py-4 text-black">
+                            {errorMessage}
+                        </p>
+                    )
+                }
             </form>
 
             <div class="mt-12 border-t border-black/20 pt-10 text-black">

@@ -9,6 +9,7 @@ const COLLECTIONS = {
     equipe: "equipe",
     partenaire: "partenaire",
     faq: "faq",
+    contact: "contact",
     users: "users"
 };
 
@@ -481,6 +482,10 @@ export async function addScene(data) {
 // Modifier scène
 export async function updateScene(id, data) {
     return pb.collection(COLLECTIONS.scene).update(id, data);
+}
+
+export async function addContactMessage(data) {
+    return pb.collection(COLLECTIONS.contact).create(data);
 }
 
 export async function saveEntity(entityType, data, id = null) {
