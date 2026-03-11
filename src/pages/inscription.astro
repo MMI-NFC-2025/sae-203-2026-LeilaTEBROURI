@@ -1,0 +1,136 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { registerUser } from "../../backend/backend.mjs";
+
+let errorMessage = "";
+let successMessage = "";
+let nomValue = "";
+let emailValue = "";
+
+if (Astro.request.method === "POST") {
+    const data = await Astro.request.formData();
+
+    nomValue = String(data.get("nom") ?? "").trim();
+    emailValue = String(data.get("email") ?? "").trim();
+    const password = String(data.get("password") ?? "").trim();
+    const passwordConfirm = String(data.get("passwordConfirm") ?? "").trim();
+
+    if (!nomValue || !emailValue || !password || !passwordConfirm) {
+        errorMessage = "Veuillez remplir tous les champs.";
+    } else if (password !== passwordConfirm) {
+        errorMessage = "Les mots de passe ne correspondent pas.";
+    } else if (password.length < 8) {
+        errorMessage = "Le mot de passe doit contenir au moins 8 caractères.";
+    } else {
+        try {
+            await registerUser(nomValue, emailValue, password);
+            successMessage =
+                "Compte créé avec succès. Vous pouvez maintenant vous connecter.";
+            nomValue = "";
+            emailValue = "";
+        } catch (error) {
+            const msg =
+                error instanceof Error ? error.message : String(error ?? "");
+
+            if (msg.includes("email")) {
+                errorMessage = "Cet email est déjà utilisé.";
+            } else {
+                errorMessage = "Impossible de créer le compte pour le moment.";
+            }
+        }
+    }
+}
+---
+
+<Layout>
+    <Header />
+    <main class="min-h-screen bg-(--blue) px-6 py-10 lg:pb-16">
+        <section class="mx-auto w-full max-w-3xl space-y-6">
+            <div
+                class="mx-auto w-fit bg-(--red) px-8 py-5 text-center text-black"
+            >
+                <h2 class="leading-none">Inscription</h2>
+            </div>
+
+            {
+                successMessage && (
+                    <p class="bg-(--yellow) p-4 text-(--dark)">
+                        {successMessage}
+                        <a href="/connexion" class="underline ml-2">
+                            Se connecter
+                        </a>
+                    </p>
+                )
+            }
+            {
+                errorMessage && (
+                    <p class="bg-(--red) p-4 text-black">{errorMessage}</p>
+                )
+            }
+
+            <form
+                method="POST"
+                class="space-y-4 bg-(--navyblue) p-6 text-(--light)"
+            >
+                <label class="block">
+                    <span class="mb-2 block">Nom</span>
+                    <input
+                        type="text"
+                        name="nom"
+                        required
+                        value={nomValue}
+                        class="w-full bg-(--light) px-4 py-3 text-(--dark)"
+                    />
+                </label>
+
+                <label class="block">
+                    <span class="mb-2 block">Email</span>
+                    <input
+                        type="email"
+                        name="email"
+                        required
+                        value={emailValue}
+                        class="w-full bg-(--light) px-4 py-3 text-(--dark)"
+                    />
+                </label>
+
+                <label class="block">
+                    <span class="mb-2 block">Mot de passe</span>
+                    <input
+                        type="password"
+                        name="password"
+                        required
+                        minlength="8"
+                        class="w-full bg-(--light) px-4 py-3 text-(--dark)"
+                    />
+                </label>
+
+                <label class="block">
+                    <span class="mb-2 block">Confirmer le mot de passe</span>
+                    <input
+                        type="password"
+                        name="passwordConfirm"
+                        required
+                        minlength="8"
+                        class="w-full bg-(--light) px-4 py-3 text-(--dark)"
+                    />
+                </label>
+
+                <button
+                    type="submit"
+                    class="bg-(--yellow) px-6 py-3 text-(--dark)"
+                >
+                    Créer mon compte
+                </button>
+
+                <p class="text-sm">
+                    Déjà un compte ?
+                    <a href="/connexion" class="underline"> Se connecter </a>
+                </p>
+            </form>
+        </section>
+    </main>
+    <Footer />
+</Layout>

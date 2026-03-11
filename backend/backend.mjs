@@ -511,6 +511,16 @@ export async function loginUser(email, password) {
     };
 }
 
+export async function registerUser(nom, email, password) {
+    return pb.collection(COLLECTIONS.users).create({
+        name: nom,
+        email,
+        password,
+        passwordConfirm: password,
+        emailVisibility: true
+    });
+}
+
 export function logoutUser() {
     pb.authStore.clear();
 }

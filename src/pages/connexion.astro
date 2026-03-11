@@ -128,6 +128,13 @@ const connectedEmail = Astro.cookies.get("pb_user_email")?.value ?? "";
                         >
                             Se connecter
                         </button>
+
+                        <p class="text-sm">
+                            Pas encore de compte ?
+                            <a href="/inscription" class="underline">
+                                S'inscrire
+                            </a>
+                        </p>
                     </form>
                 )
             }
