@@ -1,7 +1,5 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
 import PbImage from "../components/PbImage.astro";
 import image3 from "../assets/image3.avif";
 import {
@@ -14,7 +12,6 @@ const equipe = await homepageEquipe();
 ---
 
 <Layout>
-    <Header />
     <main class="min-h-screen bg-(--blue) pt-10 pb-10 lg:pb-16">
         <div
             class="mx-auto w-fit bg-(--red) px-8 py-5 text-center text-black mb-10"
@@ -118,5 +115,4 @@ const equipe = await homepageEquipe();
             </div>
         </section>
     </main>
-    <Footer />
 </Layout>

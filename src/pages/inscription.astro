@@ -1,7 +1,5 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
 import { registerUser } from "../../backend/backend.mjs";
 
 let errorMessage = "";
@@ -45,7 +43,6 @@ if (Astro.request.method === "POST") {
 ---
 
 <Layout>
-    <Header />
     <main class="min-h-screen bg-(--blue) px-6 py-10 lg:pb-16">
         <section class="mx-auto w-full max-w-3xl space-y-6">
             <div
@@ -132,5 +129,4 @@ if (Astro.request.method === "POST") {
             </form>
         </section>
     </main>
-    <Footer />
 </Layout>

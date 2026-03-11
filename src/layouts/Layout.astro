@@ -2,6 +2,8 @@
 import "@fontsource/barrio";
 import "@fontsource-variable/inter";
 import "../styles/global.css";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
 
 const pathname = Astro.url.pathname;
 const segments = pathname.split("/").filter(Boolean);
@@ -66,6 +68,8 @@ const description =
 		<title>{title}</title>
 	</head>
 	<body>
+		<Header />
 		<slot />
+		<Footer />
 	</body>
 </html>

@@ -1,7 +1,5 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import Header from "../../components/Header.astro";
-import Footer from "../../components/Footer.astro";
 import PbImage from "../../components/PbImage.astro";
 import {
     artisteSlug,
@@ -27,7 +25,6 @@ if (id) {
 ---
 
 <Layout>
-    <Header />
     <main class="min-h-screen bg-(--blue) px-6 py-10 lg:pb-16">
         {
             scene ? (
@@ -94,5 +91,4 @@ if (id) {
             )
         }
     </main>
-    <Footer />
 </Layout>

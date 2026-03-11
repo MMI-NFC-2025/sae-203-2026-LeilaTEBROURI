@@ -1,7 +1,5 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
 import { addContactMessage } from "../../backend/backend.mjs";
 
 let successMessage = "";
@@ -61,7 +59,6 @@ if (Astro.request.method === "POST") {
 ---
 
 <Layout>
-    <Header />
     <main class="min-h-screen bg-(--blue) px-6 py-10 lg:pb-16">
         <div
             class="mx-auto mb-10 w-fit bg-(--red) px-8 py-5 text-center text-black"
@@ -295,5 +292,4 @@ if (Astro.request.method === "POST") {
             </div>
         </section>
     </main>
-    <Footer />
 </Layout>

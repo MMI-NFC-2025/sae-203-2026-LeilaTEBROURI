@@ -1,7 +1,5 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import Header from "../../components/Header.astro";
-import Footer from "../../components/Footer.astro";
 import PbImage from "../../components/PbImage.astro";
 import {
     artisteSlug,
@@ -142,7 +140,6 @@ const programmation = Object.values(groupedProgrammation);
 ---
 
 <Layout>
-    <Header />
     <main class="min-h-screen bg-(--blue) px-6 py-10 lg:pb-16">
         <div
             class="mx-auto w-fit bg-(--red) px-8 py-5 text-center text-black mb-10"
@@ -283,5 +280,4 @@ const programmation = Object.values(groupedProgrammation);
             <h2 class="leading-none">Télécharger le programme</h2>
         </div>
     </main>
-    <Footer />
 </Layout>

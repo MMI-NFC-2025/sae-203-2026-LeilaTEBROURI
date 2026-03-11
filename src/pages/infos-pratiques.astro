@@ -1,7 +1,5 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
 import { homepageFaq } from "../../backend/backend.mjs";
 
 type FaqItem = {
@@ -16,7 +14,6 @@ const faqRightColumn = faqItems.filter((_, index) => index % 2 === 1);
 ---
 
 <Layout>
-    <Header />
     <main class="min-h-screen bg-(--blue) px-6 py-10 lg:pb-16">
         <div
             class="mx-auto mb-10 w-fit bg-(--red) px-8 py-5 text-center text-black"
@@ -151,5 +148,4 @@ const faqRightColumn = faqItems.filter((_, index) => index % 2 === 1);
             }
         </section>
     </main>
-    <Footer />
 </Layout>
