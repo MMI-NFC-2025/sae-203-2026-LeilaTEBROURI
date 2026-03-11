@@ -4,6 +4,7 @@ import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
 import PbImage from "../../components/PbImage.astro";
 import {
+    artisteSlug,
     allArtistesByDate,
     allScenesByName,
 } from "../../../backend/backend.mjs";
@@ -246,7 +247,7 @@ const programmation = Object.values(groupedProgrammation);
                             <div class="space-y-3 lg:flex lg:flex-wrap lg:justify-center lg:gap-4 lg:space-y-0">
                                 {jour.items.map((artiste) => (
                                     <a
-                                        href={`/programmation/${artiste.id}`}
+                                        href={`/programmation/${artisteSlug(artiste.nom)}`}
                                         class="block bg-(--yellow) p-4 text-(--dark) lg:w-full lg:max-w-sm"
                                     >
                                         <PbImage

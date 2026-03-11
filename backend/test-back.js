@@ -6,8 +6,10 @@ import {
     homepageProgrammation,
     homepageArtistesCarousel,
     homepageArtisteById,
+    homepageArtisteBySlugOrId,
     allArtistesAlphabet,
     artisteById,
+    artisteSlug,
     sceneById,
     artistesBySceneId,
     artistesBySceneName,
@@ -128,6 +130,23 @@ try {
     }
 
     console.log(await homepageArtisteById(artisteId));
+} catch (e) {
+    console.error(e);
+}
+
+
+// Test détail artiste format front par slug (nom)
+try {
+    console.log("=== Détail artiste format front par slug ===");
+    const artisteNom = artistesByDate[0]?.nom;
+
+    if (!artisteNom) {
+        throw new Error("Aucun nom artiste disponible.");
+    }
+
+    const slug = artisteSlug(artisteNom);
+    console.log({ slug, artisteNom });
+    console.log(await homepageArtisteBySlugOrId(slug));
 } catch (e) {
     console.error(e);
 }

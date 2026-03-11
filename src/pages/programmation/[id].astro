@@ -5,14 +5,15 @@ import Footer from "../../components/Footer.astro";
 import PbImage from "../../components/PbImage.astro";
 import imageIllustrationGraphique from "../../assets/imageillustrationgraphique.avif";
 import {
-    homepageArtisteById,
+    artisteSlug,
+    homepageArtisteBySlugOrId,
     homepageArtistesCarousel,
 } from "../../../backend/backend.mjs";
 
 const { id } = Astro.params;
-const artiste = await homepageArtisteById(id);
+const artiste = await homepageArtisteBySlugOrId(id);
 const artistesCarousel = (await homepageArtistesCarousel()).filter(
-    (item) => item.id !== id,
+    (item) => item.id !== artiste?.id,
 );
 const artisteImages = Array.isArray(artiste?.imageUrls)
     ? artiste.imageUrls.slice(0, 3)
@@ -124,7 +125,7 @@ const artisteImages = Array.isArray(artiste?.imageUrls)
                             <div class="flex gap-4 overflow-x-auto pb-2">
                                 {artistesCarousel.map((item) => (
                                     <a
-                                        href={`/programmation/${item.id}`}
+                                        href={`/programmation/${artisteSlug(item.nom)}`}
                                         class="min-w-64 bg-(--yellow) p-3 text-(--dark) lg:min-w-80"
                                     >
                                         <PbImage

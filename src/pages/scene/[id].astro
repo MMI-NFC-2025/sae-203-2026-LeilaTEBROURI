@@ -4,6 +4,7 @@ import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
 import PbImage from "../../components/PbImage.astro";
 import {
+    artisteSlug,
     sceneById,
     artistesBySceneId,
     sceneImgUrl,
@@ -65,7 +66,7 @@ if (id) {
                             <div class="space-y-3 lg:grid lg:grid-cols-(--my-grid) lg:gap-4 lg:space-y-0">
                                 {artistes.map((artiste) => (
                                     <a
-                                        href={`/programmation/${artiste.id}`}
+                                        href={`/programmation/${artisteSlug(artiste.nom)}`}
                                         class="block bg-(--yellow) p-4 text-(--dark) lg:col-span-4 lg:h-full"
                                     >
                                         <PbImage

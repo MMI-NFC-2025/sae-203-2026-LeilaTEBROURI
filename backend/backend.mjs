@@ -19,6 +19,15 @@ function escapeFilterValue(value) {
     return String(value).replace(/\\/g, "\\\\").replace(/\"/g, '\\\"');
 }
 
+export function artisteSlug(nom) {
+    return String(nom ?? "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+}
+
 function getCollectionName(entityType) {
     const key = String(entityType ?? "").toLowerCase();
     if (key !== COLLECTIONS.artiste && key !== COLLECTIONS.scene) {
@@ -138,6 +147,7 @@ export async function homepageArtistesCarousel() {
             return {
                 id: String(artiste.id ?? ""),
                 nom: String(artiste.nom ?? "Artiste"),
+                slug: artisteSlug(artiste.nom ?? "Artiste"),
                 scene: String(artiste.expand?.scene?.nom ?? ""),
                 date,
                 heure,
@@ -321,6 +331,50 @@ export async function artisteById(id) {
     });
 }
 
+function homepageArtisteDetailFromRecord(artiste) {
+    const rawDateTime = String(artiste.date_performance ?? "");
+    const dateKey = rawDateTime.slice(0, 10);
+    const heure = rawDateTime.slice(11, 16);
+
+    const dateLabel = dateKey
+        ? new Date(`${dateKey}T00:00:00Z`).toLocaleDateString("fr-FR", {
+            weekday: "long",
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+            timeZone: "UTC"
+        })
+        : "";
+
+    const imageFiles = Array.isArray(artiste.img)
+        ? artiste.img.map((file) => String(file ?? "").trim()).filter(Boolean)
+        : artiste.img
+            ? [String(artiste.img).trim()].filter(Boolean)
+            : [];
+
+    const imageUrls = imageFiles.map(
+        (fileName) => `${POCKETBASE_URL}/api/files/${COLLECTIONS.artiste}/${String(artiste.id ?? "")}/${fileName}?thumb=1200x0`
+    );
+
+    return {
+        id: String(artiste.id ?? ""),
+        nom: String(artiste.nom ?? "Artiste"),
+        slug: artisteSlug(artiste.nom ?? "Artiste"),
+        genre: String(artiste.genre ?? ""),
+        description: String(artiste.description ?? ""),
+        date: dateLabel,
+        heure,
+        scene: String(artiste.expand?.scene?.nom ?? ""),
+        img: imageFiles,
+        imageUrls,
+        record: {
+            id: String(artiste.id ?? ""),
+            collectionName: COLLECTIONS.artiste,
+            img: imageFiles
+        }
+    };
+}
+
 
 
 // Détail artiste prêt pour le front
@@ -331,46 +385,38 @@ export async function homepageArtisteById(id) {
         }
 
         const artiste = await artisteById(id);
-        const rawDateTime = String(artiste.date_performance ?? "");
-        const dateKey = rawDateTime.slice(0, 10);
-        const heure = rawDateTime.slice(11, 16);
+        return homepageArtisteDetailFromRecord(artiste);
+    } catch {
+        return null;
+    }
+}
 
-        const dateLabel = dateKey
-            ? new Date(`${dateKey}T00:00:00Z`).toLocaleDateString("fr-FR", {
-                weekday: "long",
-                day: "2-digit",
-                month: "long",
-                year: "numeric",
-                timeZone: "UTC"
-            })
-            : "";
+export async function homepageArtisteBySlugOrId(value) {
+    try {
+        if (!value) {
+            return null;
+        }
 
-        const imageFiles = Array.isArray(artiste.img)
-            ? artiste.img.map((file) => String(file ?? "").trim()).filter(Boolean)
-            : artiste.img
-                ? [String(artiste.img).trim()].filter(Boolean)
-                : [];
+        const artisteByPocketbaseId = await homepageArtisteById(value);
+        if (artisteByPocketbaseId) {
+            return artisteByPocketbaseId;
+        }
 
-        const imageUrls = imageFiles.map(
-            (fileName) => `${POCKETBASE_URL}/api/files/${COLLECTIONS.artiste}/${String(artiste.id ?? "")}/${fileName}?thumb=1200x0`
+        const targetSlug = artisteSlug(value);
+        if (!targetSlug) {
+            return null;
+        }
+
+        const artistes = await allArtistesByDate();
+        const artisteByNameSlug = artistes.find(
+            (artiste) => artisteSlug(artiste.nom ?? "") === targetSlug
         );
 
-        return {
-            id: String(artiste.id ?? ""),
-            nom: String(artiste.nom ?? "Artiste"),
-            genre: String(artiste.genre ?? ""),
-            description: String(artiste.description ?? ""),
-            date: dateLabel,
-            heure,
-            scene: String(artiste.expand?.scene?.nom ?? ""),
-            img: imageFiles,
-            imageUrls,
-            record: {
-                id: String(artiste.id ?? ""),
-                collectionName: COLLECTIONS.artiste,
-                img: imageFiles
-            }
-        };
+        if (!artisteByNameSlug) {
+            return null;
+        }
+
+        return homepageArtisteDetailFromRecord(artisteByNameSlug);
     } catch {
         return null;
     }

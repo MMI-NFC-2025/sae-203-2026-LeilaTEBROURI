@@ -3,7 +3,7 @@ import Layout from "../../layouts/Layout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
 import PbImage from "../../components/PbImage.astro";
-import { allArtistesByDate } from "../../../backend/backend.mjs";
+import { allArtistesByDate, artisteSlug } from "../../../backend/backend.mjs";
 
 const artistes = await allArtistesByDate();
 
@@ -78,7 +78,7 @@ const artistesList = artistes.map((artiste) => {
 
                             <div class="mt-4 lg:col-span-2 lg:mt-0 lg:text-right">
                                 <a
-                                    href={`/programmation/${artiste.id}`}
+                                    href={`/programmation/${artisteSlug(artiste.nom)}`}
                                     class="inline-block bg-(--red) px-4 py-2 text-(--dark)"
                                 >
                                     Voir la fiche
