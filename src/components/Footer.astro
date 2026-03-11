@@ -15,12 +15,12 @@ const footerLinks = [
     class="overflow-x-hidden bg-amber-300 px-4 py-8 text-black lg:px-10 lg:py-12"
 >
     <div
-        class="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_9rem] gap-4 sm:grid-cols-[1fr_auto] sm:gap-8 lg:gap-12"
+        class="mx-auto grid grid-cols-2 gap-4 sm:gap-8 lg:grid-cols-(--my-grid) lg:justify-center lg:gap-8"
     >
-        <div class="min-w-0 space-y-10">
+        <div class="min-w-0 space-y-10 lg:col-span-7">
             <div class="space-y-3">
                 <h2 class="text-4xl uppercase lg:text-5xl">Jumelages</h2>
-                <h3 class="text-3xl">Festival</h3>
+                <h3 class="sm:text-3xl">Festival</h3>
             </div>
 
             <section class="space-y-3 text-base">
@@ -44,7 +44,7 @@ const footerLinks = [
         </div>
 
         <div
-            class="flex w-36 min-w-0 flex-col items-start gap-6 mt-35 sm:w-auto lg:items-start lg:pt-10"
+            class="mt-35 flex w-36 min-w-0 flex-col items-start gap-6 sm:w-auto lg:col-span-3 lg:col-start-10 lg:mt-0 lg:items-start lg:pt-10"
         >
             <nav aria-label="Navigation footer">
                 <ul class="space-y-2 text-base leading-snug">
