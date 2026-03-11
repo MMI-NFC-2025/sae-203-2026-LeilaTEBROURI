@@ -1,27 +1,131 @@
 import PocketBase from "pocketbase";
 
-const POCKETBASE_URL = "https://sae-203-jumelages.tebrouri.fr";
-const pb = new PocketBase(POCKETBASE_URL);
+const url = "https://sae-203-jumelages.tebrouri.fr";
+const pb = new PocketBase(url);
 
-const COLLECTIONS = {
-    artiste: "artiste",
-    scene: "scene",
-    equipe: "equipe",
-    partenaire: "partenaire",
-    faq: "faq",
-    contact: "contact",
-    users: "users"
-};
+const collArtiste = "artiste";
+const collScene = "scene";
+const collEquipe = "equipe";
+const collPartenaire = "partenaire";
+const collFaq = "faq";
+const collContact = "contact";
+const collUsers = "users";
 
-const SCENE_PRINCIPALE_NAME = "La Scène Principale";
-const EQUIPE_FIRST_MEMBER_NAME = "Sophie Marchand";
+const nomScenePrincipale = "La Scène Principale";
+const nomEquipePrioritaire = "Sophie Marchand";
 
-function escapeFilterValue(value) {
-    return String(value).replace(/\\/g, "\\\\").replace(/\"/g, '\\\"');
+// Nettoyage des valeurs pour filtre
+function cleanFilter(value) {
+    const text = value ? value + "" : "";
+    return text.replace(/\\/g, "\\\\").replace(/\"/g, '\\\"');
 }
 
+// Formatage de la date
+function formatDate(dateKey) {
+    if (!dateKey) {
+        return "";
+    }
+
+    return new Date(`${dateKey}T00:00:00Z`).toLocaleDateString("fr-FR", {
+        weekday: "long",
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+        timeZone: "UTC"
+    });
+}
+
+// Extraction date et heure
+function getDateHeure(dateTimeText) {
+    const text = (dateTimeText ? dateTimeText + "" : "").trim();
+
+    if (!text) {
+        return { dateKey: "", heure: "" };
+    }
+
+    const morceaux = text.split(" ");
+    const dateKey = morceaux[0] || "";
+    const heureComplete = morceaux[1] || "";
+    const heureMorceaux = heureComplete.split(":");
+
+    if (heureMorceaux[0] && heureMorceaux[1]) {
+        return {
+            dateKey,
+            heure: `${heureMorceaux[0]}:${heureMorceaux[1]}`
+        };
+    }
+
+    return { dateKey, heure: "" };
+}
+
+// URL des fichiers PocketBase
+function getFileUrl(collection, id, fileName) {
+    if (!id || !fileName) {
+        return "";
+    }
+
+    return `${url}/api/files/${collection}/${id}/${fileName}`;
+}
+
+// Vérification du type d'entité
+function getEntityCollection(entityType) {
+    const type = ((entityType || "") + "").toLowerCase();
+
+    if (type !== collArtiste && type !== collScene) {
+        throw new Error("entityType doit être 'artiste' ou 'scene'.");
+    }
+
+    return type;
+}
+
+// Détail artiste pour le front
+function toArtisteDetail(artiste) {
+    const datePerformance = artiste && artiste.date_performance ? artiste.date_performance : "";
+    const dateInfo = getDateHeure(datePerformance);
+    const dateKey = dateInfo.dateKey;
+    const heure = dateInfo.heure;
+    const nom = artiste && artiste.nom ? artiste.nom + "" : "Artiste";
+
+    let imgSource = null;
+    if (artiste && artiste.img) {
+        imgSource = artiste.img;
+    }
+
+    const imageFiles = Array.isArray(imgSource)
+        ? artiste.img.map((file) => (file ? file + "" : "").trim()).filter(Boolean)
+        : imgSource
+            ? [(artiste.img + "").trim()].filter(Boolean)
+            : [];
+
+    let sceneNom = "";
+    if (artiste && artiste.expand && artiste.expand.scene && artiste.expand.scene.nom) {
+        sceneNom = artiste.expand.scene.nom + "";
+    }
+
+    const artisteId = artiste && artiste.id ? artiste.id + "" : "";
+
+    return {
+        id: artisteId,
+        nom,
+        slug: artisteSlug(nom),
+        genre: artiste && artiste.genre ? artiste.genre + "" : "",
+        description: artiste && artiste.description ? artiste.description + "" : "",
+        date: formatDate(dateKey),
+        heure,
+        scene: sceneNom,
+        img: imageFiles,
+        imageUrls: imageFiles.map((fileName) => `${getFileUrl(collArtiste, artisteId, fileName)}?thumb=1200x0`),
+        record: {
+            id: artisteId,
+            collectionName: collArtiste,
+            img: imageFiles
+        }
+    };
+}
+
+// Slug artiste
 export function artisteSlug(nom) {
-    return String(nom ?? "")
+    return ((nom || "") + "")
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
         .toLowerCase()
@@ -29,133 +133,90 @@ export function artisteSlug(nom) {
         .replace(/^-+|-+$/g, "");
 }
 
-function getCollectionName(entityType) {
-    const key = String(entityType ?? "").toLowerCase();
-    if (key !== COLLECTIONS.artiste && key !== COLLECTIONS.scene) {
-        throw new Error("entityType doit être 'artiste' ou 'scene'.");
-    }
-
-    return key;
-}
-
+// Client PocketBase
 export function getPocketBaseClient() {
     return pb;
 }
 
-
-
 // Liste des artistes par date
 export async function allArtistesByDate() {
-    return pb.collection(COLLECTIONS.artiste).getFullList({
+    return pb.collection(collArtiste).getFullList({
         sort: "date_performance",
         expand: "scene"
     });
 }
 
-/**
- * @typedef {Object} HomepageProgrammationItem
- * @property {string} id
- * @property {string} nom
- * @property {string} heure
- * @property {string} scene
- * @property {string} img
- * @property {{ id: string, collectionName: string, img: string }} record
- */
-
-/**
- * @typedef {Object} HomepageProgrammationGroup
- * @property {string} label
- * @property {HomepageProgrammationItem[]} items
- */
-
-
-
-// Programmation artistes prête pour le front (groupée par date + heure)
+// Programmation groupée par jour
 export async function homepageProgrammation() {
     try {
         const artistes = await allArtistesByDate();
+        const grouped = {};
 
-        /** @type {Record<string, HomepageProgrammationGroup>} */
-        const groupedProgrammation = artistes.reduce((groups, artiste) => {
-            const rawDateTime = String(artiste.date_performance ?? "");
-            const dateKey = rawDateTime.slice(0, 10);
-            const heure = rawDateTime.slice(11, 16);
+        for (const artiste of artistes) {
+            const dateInfo = getDateHeure(artiste.date_performance);
+            const dateKey = dateInfo.dateKey;
+            const heure = dateInfo.heure;
 
             if (!dateKey) {
-                return groups;
+                continue;
             }
 
-            if (!groups[dateKey]) {
-                const formattedDate = new Date(`${dateKey}T00:00:00Z`).toLocaleDateString("fr-FR", {
-                    weekday: "long",
-                    day: "2-digit",
-                    month: "long",
-                    year: "numeric",
-                    timeZone: "UTC"
-                });
-
-                groups[dateKey] = {
-                    label: formattedDate,
+            if (!grouped[dateKey]) {
+                grouped[dateKey] = {
+                    label: formatDate(dateKey),
                     items: []
                 };
             }
 
-            groups[dateKey].items.push({
-                id: String(artiste.id ?? ""),
-                nom: String(artiste.nom ?? "Artiste"),
+            let sceneNom = "";
+            if (artiste.expand && artiste.expand.scene && artiste.expand.scene.nom) {
+                sceneNom = artiste.expand.scene.nom + "";
+            }
+
+            grouped[dateKey].items.push({
+                id: artiste.id ? artiste.id + "" : "",
+                nom: artiste.nom ? artiste.nom + "" : "Artiste",
                 heure,
-                scene: String(artiste.expand?.scene?.nom ?? ""),
-                img: artiste.img ? String(artiste.img) : "",
+                scene: sceneNom,
+                img: artiste.img ? artiste.img + "" : "",
                 record: {
-                    id: String(artiste.id ?? ""),
-                    collectionName: COLLECTIONS.artiste,
-                    img: artiste.img ? String(artiste.img) : ""
+                    id: artiste.id ? artiste.id + "" : "",
+                    collectionName: collArtiste,
+                    img: artiste.img ? artiste.img + "" : ""
                 }
             });
+        }
 
-            return groups;
-        }, {});
-
-        return Object.values(groupedProgrammation);
+        return Object.values(grouped);
     } catch {
-        /** @type {HomepageProgrammationGroup[]} */
         return [];
     }
 }
 
-
-
-// Liste artistes prête pour un carousel (date + heure + scène)
+// Liste des artistes pour carousel
 export async function homepageArtistesCarousel() {
     try {
         const artistes = await allArtistesByDate();
 
         return artistes.map((artiste) => {
-            const rawDateTime = String(artiste.date_performance ?? "");
-            const dateKey = rawDateTime.slice(0, 10);
-            const heure = rawDateTime.slice(11, 16);
-
-            const date = dateKey
-                ? new Date(`${dateKey}T00:00:00Z`).toLocaleDateString("fr-FR", {
-                    weekday: "long",
-                    day: "2-digit",
-                    month: "long",
-                    year: "numeric",
-                    timeZone: "UTC"
-                })
-                : "";
+            const dateInfo = getDateHeure(artiste.date_performance);
+            const dateKey = dateInfo.dateKey;
+            let sceneNom = "";
+            if (artiste.expand && artiste.expand.scene && artiste.expand.scene.nom) {
+                sceneNom = artiste.expand.scene.nom + "";
+            }
 
             return {
-                id: String(artiste.id ?? ""),
-                nom: String(artiste.nom ?? "Artiste"),
-                slug: artisteSlug(artiste.nom ?? "Artiste"),
-                scene: String(artiste.expand?.scene?.nom ?? ""),
-                date,
-                heure,
+                id: artiste.id ? artiste.id + "" : "",
+                nom: artiste.nom ? artiste.nom + "" : "Artiste",
+                slug: artisteSlug(artiste.nom ? artiste.nom + "" : "Artiste"),
+                scene: sceneNom,
+                date: formatDate(dateKey),
+                heure: dateInfo.heure,
                 record: {
-                    id: String(artiste.id ?? ""),
-                    collectionName: COLLECTIONS.artiste,
-                    img: artiste.img ? String(artiste.img) : ""
+                    id: artiste.id ? artiste.id + "" : "",
+                    collectionName: collArtiste,
+                    img: artiste.img ? artiste.img + "" : ""
                 }
             };
         });
@@ -164,147 +225,122 @@ export async function homepageArtistesCarousel() {
     }
 }
 
-
-
 // Liste des scènes par nom
 export async function allScenesByName() {
-    return pb.collection(COLLECTIONS.scene).getFullList({
+    return pb.collection(collScene).getFullList({
         sort: "nom"
     });
 }
 
-
-
-// Liste des partenaires
+// Liste des partenaires par création
 export async function allPartenairesByCreated() {
-    return pb.collection(COLLECTIONS.partenaire).getFullList({
+    return pb.collection(collPartenaire).getFullList({
         sort: "created",
         fields: "id,nom,lien,logo"
     });
 }
 
-
-
-// Liste partenaires prête pour le front
+// Partenaires pour le front
 export async function homepagePartenaires() {
     try {
         const records = await allPartenairesByCreated();
 
         return records.map((partenaire) => ({
-            id: partenaire.id,
-            nom: String(partenaire.nom ?? ""),
-            lien: partenaire.lien ? String(partenaire.lien) : undefined,
-            logo: partenaire.logo ? String(partenaire.logo) : undefined
+            id: partenaire.id ? partenaire.id + "" : "",
+            nom: partenaire.nom ? partenaire.nom + "" : "",
+            lien: partenaire.lien ? partenaire.lien + "" : undefined,
+            logo: partenaire.logo ? partenaire.logo + "" : undefined
         }));
     } catch {
         return [];
     }
 }
 
-
-
-// Liste FAQ triée par création
+// Liste FAQ par création
 export async function allFaqByCreated() {
-    return pb.collection(COLLECTIONS.faq).getFullList({
+    return pb.collection(collFaq).getFullList({
         sort: "created",
         fields: "id,question,reponse"
     });
 }
 
-
-
-// FAQ prête pour le front
+// FAQ pour le front
 export async function homepageFaq() {
     try {
         const records = await allFaqByCreated();
 
         return records.map((item) => ({
-            id: String(item.id ?? ""),
-            question: String(item.question ?? ""),
-            reponse: String(item.reponse ?? "")
+            id: item.id ? item.id + "" : "",
+            question: item.question ? item.question + "" : "",
+            reponse: item.reponse ? item.reponse + "" : ""
         }));
     } catch {
         return [];
     }
 }
 
-
-
 // URL logo partenaire
 export function partenaireLogoUrl(partenaire) {
-    if (!partenaire?.logo || !partenaire?.id) {
-        return "";
-    }
-
-    return `${POCKETBASE_URL}/api/files/${COLLECTIONS.partenaire}/${partenaire.id}/${partenaire.logo}`;
+    const id = partenaire && partenaire.id ? partenaire.id : "";
+    const logo = partenaire && partenaire.logo ? partenaire.logo : "";
+    return getFileUrl(collPartenaire, id, logo);
 }
 
-
-
-// Infos scène principale prêtes pour le front
+// Scène principale pour le front
 export async function homepageScenePrincipale() {
     try {
-        const safeSceneName = escapeFilterValue(SCENE_PRINCIPALE_NAME);
-        const scene = await pb.collection(COLLECTIONS.scene).getFirstListItem(
-            `nom = "${safeSceneName}"`,
-            {
-                fields: "id,nom,img,description,localisation,capacite"
-            }
-        );
+        const sceneName = cleanFilter(nomScenePrincipale);
+        const scene = await pb.collection(collScene).getFirstListItem(`nom = "${sceneName}"`, {
+            fields: "id,nom,img,description,localisation,capacite"
+        });
 
         return {
-            id: scene.id,
-            collectionName: COLLECTIONS.scene,
-            nom: String(scene.nom ?? ""),
-            img: scene.img ? String(scene.img) : "",
-            description: scene.description ? String(scene.description) : "",
-            localisation: scene.localisation ? String(scene.localisation) : "",
-            capacite: scene.capacite ?? null
+            id: scene.id ? scene.id + "" : "",
+            collectionName: collScene,
+            nom: scene.nom ? scene.nom + "" : "",
+            img: scene.img ? scene.img + "" : "",
+            description: scene.description ? scene.description + "" : "",
+            localisation: scene.localisation ? scene.localisation + "" : "",
+            capacite: scene.capacite !== undefined ? scene.capacite : null
         };
     } catch {
         return null;
     }
 }
 
-
-
 // URL image scène
 export function sceneImgUrl(scene) {
-    if (!scene?.img || !scene?.id) {
-        return "";
-    }
-
-    return `${POCKETBASE_URL}/api/files/${COLLECTIONS.scene}/${scene.id}/${scene.img}`;
+    const id = scene && scene.id ? scene.id : "";
+    const img = scene && scene.img ? scene.img : "";
+    return getFileUrl(collScene, id, img);
 }
 
-
-
-// Liste équipe prête pour le front
+// Équipe pour le front
 export async function homepageEquipe() {
     try {
-        const records = await pb.collection(COLLECTIONS.equipe).getFullList({
+        const records = await pb.collection(collEquipe).getFullList({
             sort: "nom",
             fields: "id,nom,role,img"
         });
 
         const membres = records.map((membre) => ({
-            id: membre.id,
-            collectionName: COLLECTIONS.equipe,
-            nom: String(membre.nom ?? ""),
-            role: String(membre.role ?? ""),
-            img: membre.img ? String(membre.img) : ""
+            id: membre.id ? membre.id + "" : "",
+            collectionName: collEquipe,
+            nom: membre.nom ? membre.nom + "" : "",
+            role: membre.role ? membre.role + "" : "",
+            img: membre.img ? membre.img + "" : ""
         }));
 
-        membres.sort((firstMember, secondMember) => {
-            if (firstMember.nom === EQUIPE_FIRST_MEMBER_NAME) {
+        membres.sort((a, b) => {
+            if (a.nom === nomEquipePrioritaire) {
                 return -1;
             }
 
-            if (secondMember.nom === EQUIPE_FIRST_MEMBER_NAME) {
+            if (b.nom === nomEquipePrioritaire) {
                 return 1;
             }
 
-            return firstMember.nom.localeCompare(secondMember.nom, "fr");
+            return a.nom.localeCompare(b.nom, "fr");
         });
 
         return membres;
@@ -313,72 +349,22 @@ export async function homepageEquipe() {
     }
 }
 
-
-
-// Liste artistes ordre alphaphabetique
+// Liste des artistes par ordre alphabétique
 export async function allArtistesAlphabet() {
-    return pb.collection(COLLECTIONS.artiste).getFullList({
+    return pb.collection(collArtiste).getFullList({
         sort: "nom",
         expand: "scene"
     });
 }
 
-
-
-// Infos artiste par ID
+// Artiste par id
 export async function artisteById(id) {
-    return pb.collection(COLLECTIONS.artiste).getOne(id, {
+    return pb.collection(collArtiste).getOne(id, {
         expand: "scene"
     });
 }
 
-function homepageArtisteDetailFromRecord(artiste) {
-    const rawDateTime = String(artiste.date_performance ?? "");
-    const dateKey = rawDateTime.slice(0, 10);
-    const heure = rawDateTime.slice(11, 16);
-
-    const dateLabel = dateKey
-        ? new Date(`${dateKey}T00:00:00Z`).toLocaleDateString("fr-FR", {
-            weekday: "long",
-            day: "2-digit",
-            month: "long",
-            year: "numeric",
-            timeZone: "UTC"
-        })
-        : "";
-
-    const imageFiles = Array.isArray(artiste.img)
-        ? artiste.img.map((file) => String(file ?? "").trim()).filter(Boolean)
-        : artiste.img
-            ? [String(artiste.img).trim()].filter(Boolean)
-            : [];
-
-    const imageUrls = imageFiles.map(
-        (fileName) => `${POCKETBASE_URL}/api/files/${COLLECTIONS.artiste}/${String(artiste.id ?? "")}/${fileName}?thumb=1200x0`
-    );
-
-    return {
-        id: String(artiste.id ?? ""),
-        nom: String(artiste.nom ?? "Artiste"),
-        slug: artisteSlug(artiste.nom ?? "Artiste"),
-        genre: String(artiste.genre ?? ""),
-        description: String(artiste.description ?? ""),
-        date: dateLabel,
-        heure,
-        scene: String(artiste.expand?.scene?.nom ?? ""),
-        img: imageFiles,
-        imageUrls,
-        record: {
-            id: String(artiste.id ?? ""),
-            collectionName: COLLECTIONS.artiste,
-            img: imageFiles
-        }
-    };
-}
-
-
-
-// Détail artiste prêt pour le front
+// Détail artiste par id
 export async function homepageArtisteById(id) {
     try {
         if (!id) {
@@ -386,12 +372,13 @@ export async function homepageArtisteById(id) {
         }
 
         const artiste = await artisteById(id);
-        return homepageArtisteDetailFromRecord(artiste);
+        return toArtisteDetail(artiste);
     } catch {
         return null;
     }
 }
 
+// Détail artiste par slug ou id
 export async function homepageArtisteBySlugOrId(value) {
     try {
         if (!value) {
@@ -409,101 +396,91 @@ export async function homepageArtisteBySlugOrId(value) {
         }
 
         const artistes = await allArtistesByDate();
-        const artisteByNameSlug = artistes.find(
-            (artiste) => artisteSlug(artiste.nom ?? "") === targetSlug
-        );
+        const foundArtiste = artistes.find((artiste) => {
+            const nom = artiste && artiste.nom ? artiste.nom : "";
+            return artisteSlug(nom) === targetSlug;
+        });
 
-        if (!artisteByNameSlug) {
+        if (!foundArtiste) {
             return null;
         }
 
-        return homepageArtisteDetailFromRecord(artisteByNameSlug);
+        return toArtisteDetail(foundArtiste);
     } catch {
         return null;
     }
 }
 
-
-
-// Infos scene par ID
+// Scène par id
 export async function sceneById(id) {
-    return pb.collection(COLLECTIONS.scene).getOne(id);
+    return pb.collection(collScene).getOne(id);
 }
 
-
-
-// Artistes par scene ID
+// Artistes par id de scène
 export async function artistesBySceneId(idScene) {
-    const safeSceneId = escapeFilterValue(idScene);
+    const sceneId = cleanFilter(idScene);
 
-    return pb.collection(COLLECTIONS.artiste).getFullList({
-        filter: `scene = "${safeSceneId}"`,
+    return pb.collection(collArtiste).getFullList({
+        filter: `scene = "${sceneId}"`,
         sort: "date_performance",
         expand: "scene"
     });
 }
 
-
-
-// Artistes par nom de scene
+// Artistes par nom de scène
 export async function artistesBySceneName(nomScene) {
-    const safeSceneName = escapeFilterValue(nomScene);
+    const sceneName = cleanFilter(nomScene);
 
-    return pb.collection(COLLECTIONS.artiste).getFullList({
-        filter: `scene.nom = "${safeSceneName}"`,
+    return pb.collection(collArtiste).getFullList({
+        filter: `scene.nom = "${sceneName}"`,
         sort: "date_performance",
         expand: "scene"
     });
 }
 
-
-
-// Ajouter artiste
+// Ajout artiste
 export async function addArtiste(data) {
-    return pb.collection(COLLECTIONS.artiste).create(data);
+    return pb.collection(collArtiste).create(data);
 }
 
-
-
-// Modifier artiste
+// Modification artiste
 export async function updateArtiste(id, data) {
-    return pb.collection(COLLECTIONS.artiste).update(id, data);
+    return pb.collection(collArtiste).update(id, data);
 }
 
-
-
-// Ajouter scène
+// Ajout scène
 export async function addScene(data) {
-    return pb.collection(COLLECTIONS.scene).create(data);
+    return pb.collection(collScene).create(data);
 }
 
-
-
-// Modifier scène
+// Modification scène
 export async function updateScene(id, data) {
-    return pb.collection(COLLECTIONS.scene).update(id, data);
+    return pb.collection(collScene).update(id, data);
 }
 
+// Ajout message contact
 export async function addContactMessage(data) {
-    return pb.collection(COLLECTIONS.contact).create(data);
+    return pb.collection(collContact).create(data);
 }
 
+// Sauvegarde entité
 export async function saveEntity(entityType, data, id = null) {
-    const collectionName = getCollectionName(entityType);
+    const collection = getEntityCollection(entityType);
 
     if (id) {
-        return pb.collection(collectionName).update(id, data);
+        return pb.collection(collection).update(id, data);
     }
 
-    return pb.collection(collectionName).create(data);
+    return pb.collection(collection).create(data);
 }
 
+// Connexion utilisateur
 export async function loginUser(email, password) {
     if (!email || !password) {
         throw new Error("email et password sont requis.");
     }
 
-    const authData = await pb.collection(COLLECTIONS.users).authWithPassword(email, password);
+    const authData = await pb.collection(collUsers).authWithPassword(email, password);
 
     return {
         token: authData.token,
@@ -511,8 +488,9 @@ export async function loginUser(email, password) {
     };
 }
 
+// Inscription utilisateur
 export async function registerUser(nom, email, password) {
-    return pb.collection(COLLECTIONS.users).create({
+    return pb.collection(collUsers).create({
         name: nom,
         email,
         password,
@@ -521,6 +499,7 @@ export async function registerUser(nom, email, password) {
     });
 }
 
+// Déconnexion utilisateur
 export function logoutUser() {
     pb.authStore.clear();
 }

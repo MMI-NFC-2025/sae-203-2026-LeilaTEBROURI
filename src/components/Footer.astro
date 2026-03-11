@@ -1,30 +1,42 @@
 ---
 import mmiLogo from "../assets/logo_mmi.webp";
+
+const footerLinks = [
+    { href: "/a-propos", label: "À propos" },
+    { href: "/programmation", label: "Programmation" },
+    { href: "/artistes", label: "Artistes" },
+    { href: "/scene", label: "Scène" },
+    { href: "/infos-pratiques", label: "Infos pratiques" },
+    { href: "/contact", label: "Contact" },
+];
 ---
 
-<footer class="bg-amber-300 px-4 py-8 text-black lg:px-10 lg:py-12">
-    <div class="grille space-y-8 lg:space-y-0">
-        <div class="space-y-10 lg:col-span-7">
-            <div class="space-y-1">
-                <h2 class="text-5xl uppercase">
-                    Jumelages<br />
-                </h2>
-                <h3 class="m-0 uppercase">Festival</h3>
+<footer
+    class="overflow-x-hidden bg-amber-300 px-4 py-8 text-black lg:px-10 lg:py-12"
+>
+    <div
+        class="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_9rem] gap-4 sm:grid-cols-[1fr_auto] sm:gap-8 lg:gap-12"
+    >
+        <div class="min-w-0 space-y-10">
+            <div class="space-y-3">
+                <h2 class="text-4xl uppercase lg:text-5xl">Jumelages</h2>
+                <h3 class="text-3xl">Festival</h3>
             </div>
 
             <section class="space-y-3 text-base">
                 <h3 class="uppercase">Contact</h3>
-                <p class="text-sm leading-tight">
-                    Virgile Esnaux<br />
-                    MMi1 B2<br />
-                    <p class="text-sm">virgile.esnaux@edu.univ-fcomte.fr</p>
-                </p>
-                <p class="text-sm">03.00.00.00.00</p>
+                <div class="space-y-1 text-sm leading-tight">
+                    <p>Virgile Esnaux</p>
+                    <p>MMi1 B2</p>
+                    <p>virgile.esnaux@</p>
+                    <p>edu.univ-fcomte.fr</p>
+                    <p>03.00.00.00.00</p>
+                </div>
             </section>
 
             <section class="space-y-3">
                 <h3 class="uppercase">Mentions légales</h3>
-                <p class="text-xs leading-tight">
+                <p class="max-w-xs text-xs leading-tight">
                     “projet de festival réalisé en 2025 dans le cadre d’un
                     exercice pédagogique au département MMI de Montbéliard“
                 </p>
@@ -32,20 +44,21 @@ import mmiLogo from "../assets/logo_mmi.webp";
         </div>
 
         <div
-            class="mt-33 flex flex-col items-start gap-6 lg:col-span-5 lg:mt-0 lg:pt-10"
+            class="flex w-36 min-w-0 flex-col items-start gap-6 mt-35 sm:w-auto lg:items-start lg:pt-10"
         >
             <nav aria-label="Navigation footer">
                 <ul class="space-y-2 text-base leading-snug">
-                    <li><a href="/a-propos">À propos</a></li>
-                    <li><a href="/programmation">Programmation</a></li>
-                    <li><a href="/artistes">Artistes</a></li>
-                    <li><a href="/scene">Scène</a></li>
-                    <li><a href="/infos-pratiques">Infos pratiques</a></li>
-                    <li><a href="/contact">Contact</a></li>
+                    {
+                        footerLinks.map((link) => (
+                            <li>
+                                <a href={link.href}>{link.label}</a>
+                            </li>
+                        ))
+                    }
                 </ul>
             </nav>
 
-            <section class="space-y-2" aria-label="Réseaux sociaux">
+            <section class="w-full space-y-2" aria-label="Réseaux sociaux">
                 <h3 class="uppercase">Réseaux sociaux</h3>
                 <div class="flex items-center gap-3">
                     <a
@@ -118,9 +131,11 @@ import mmiLogo from "../assets/logo_mmi.webp";
                 </div>
             </section>
 
-            <div class="h-1 w-full bg-black rounded-4xl"></div>
+            <div class="h-1 w-full rounded-4xl bg-black lg:w-72"></div>
 
-            <div class="w-full max-w-xs rounded-4xl p-5">
+            <div
+                class="w-full max-w-36 rounded-4xl p-0 sm:max-w-44 lg:max-w-xs lg:p-5"
+            >
                 <img
                     src={mmiLogo.src}
                     alt="Logo MMI"
